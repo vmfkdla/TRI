@@ -3,14 +3,14 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tria Empire — 트리아 제국</title>
 <!-- ══════════════════════════════════════════════════════════
-     깃허브 업로드 파일 규칙 (전부 WebP)
-     · 히어로(PC 가로)  : img/Hero_3.webp   (1216×832)
-     · 히어로(모바일 세로): img/Hero_2.webp   (832×1216)
-     · 웹툰            : img/1.webp ~ img/5.webp
-     · 캐릭터          : img/{이름}_{감정}.webp
+     깃허브 업로드 파일 규칙 (전부 WebP, 폴더 없이 저장소 루트에 평평하게)
+     · 히어로(PC 가로)  : Hero_3.webp   (1216×832)
+     · 히어로(모바일 세로): Hero_2.webp   (832×1216)
+     · 웹툰            : 1.webp ~ 5.webp
+     · 캐릭터          : {이름}_{감정}.webp
        감정 7종: 대화 / 기쁨 / 부끄러움 / 슬픔 / 불안 / 아픔 / 분노
-       예) img/아르테_대화.webp , img/테오도라_분노.webp
-     · BGM             : bgm.mp3 (저장소 루트)
+       예) 아르테_대화.webp , 테오도라_분노.webp
+     · BGM             : bgm.mp3
    ══════════════════════════════════════════════════════════ -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -168,8 +168,8 @@ footer .cr{margin-top:36px;font-size:11px;color:#4b566e;letter-spacing:.1em}
 
 <header class="hero" id="main">
  <picture>
-  <source media="(orientation: portrait)" srcset="img/Hero_2.webp">
-  <img src="img/Hero_3.webp" alt="트리아 제국 — 알트하벤 전경">
+  <source media="(orientation: portrait)" srcset="Hero_2.webp">
+  <img src="Hero_3.webp" alt="트리아 제국 — 알트하벤 전경">
  </picture>
  <div class="hero-txt">
   <div class="en">Tria Empire</div>
@@ -200,11 +200,11 @@ footer .cr{margin-top:36px;font-size:11px;color:#4b566e;letter-spacing:.1em}
  <div class="head"><div class="eyebrow">Webtoon</div><h2>웹툰</h2><div class="divide"></div>
   <p>프롤로그 &mdash; 그리고, 아르테</p></div>
  <div class="webtoon-wrap rv">
-  <img loading="lazy" src="img/1.webp" alt="웹툰 1">
-  <img loading="lazy" src="img/2.webp" alt="웹툰 2">
-  <img loading="lazy" src="img/3.webp" alt="웹툰 3">
-  <img loading="lazy" src="img/4.webp" alt="웹툰 4">
-  <img loading="lazy" src="img/5.webp" alt="웹툰 5">
+  <img loading="lazy" src="1.webp" alt="웹툰 1">
+  <img loading="lazy" src="2.webp" alt="웹툰 2">
+  <img loading="lazy" src="3.webp" alt="웹툰 3">
+  <img loading="lazy" src="4.webp" alt="웹툰 4">
+  <img loading="lazy" src="5.webp" alt="웹툰 5">
  </div>
 </section>
 
@@ -306,7 +306,7 @@ factions:[
 {name:"아르테",meta:"출생 미상 · 女",look:"회백색에 분홍빛이 스민 머리 · 별 장식의 흰 드레스 · 노을빛 눈동자",pers:"천진난만, 초연, 장난스러움",line:"세계를 굽어보는 어린 신. 이 세계의 어떤 잣대로도 잴 수 없는 색을, 그 아이만 알고 있었다."}]}
 ]};
 const T=window.TRIA;
-const imgOf=(name,emo)=>`img/${name}_${emo}.webp`;
+const imgOf=(name,emo)=>`${name}_${emo}.webp`;
 // lore cards
 const lg=document.getElementById('lore-grid');
 T.loreCards.forEach(([ic,title,body])=>{
