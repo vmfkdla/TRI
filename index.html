@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="ko"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tria Empire — 트리아 제국</title>
+<!-- ══════════════════════════════════════════════════════════
+     깃허브 업로드 파일 규칙 (전부 WebP)
+     · 히어로(PC 가로)  : img/Hero_3.webp   (1216×832)
+     · 히어로(모바일 세로): img/Hero_2.webp   (832×1216)
+     · 웹툰            : img/1.webp ~ img/5.webp
+     · 캐릭터          : img/{이름}_{감정}.webp
+       감정 7종: 대화 / 기쁨 / 부끄러움 / 슬픔 / 불안 / 아픔 / 분노
+       예) img/아르테_대화.webp , img/테오도라_분노.webp
+     · BGM             : bgm.mp3 (저장소 루트)
+   ══════════════════════════════════════════════════════════ -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Nanum+Myeongjo:wght@400;700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+ --bg:#0d1220; --bg2:#090d18; --panel:#151d2e; --panel2:#1c2740;
+ --pearl:#d0dae8; --pearl-hi:#eef3fa; --champ:#d8c9a0; --champ-d:#b9a878;
+ --slate:#8593ab; --line:rgba(208,218,232,.16); --line-c:rgba(216,201,160,.28);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--pearl);font-family:'Noto Sans KR',sans-serif;
+ line-height:1.75;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;z-index:-2;background:
+  radial-gradient(1px 1px at 20% 30%,rgba(238,243,250,.7),transparent),
+  radial-gradient(1px 1px at 70% 20%,rgba(238,243,250,.5),transparent),
+  radial-gradient(1px 1px at 40% 70%,rgba(238,243,250,.6),transparent),
+  radial-gradient(1px 1px at 85% 60%,rgba(238,243,250,.4),transparent),
+  radial-gradient(1.5px 1.5px at 55% 45%,rgba(216,201,160,.5),transparent),
+  radial-gradient(1px 1px at 10% 85%,rgba(238,243,250,.5),transparent);
+ background-repeat:repeat;background-size:600px 600px;opacity:.5}
+body::after{content:"";position:fixed;inset:0;z-index:-3;
+ background:radial-gradient(ellipse at 50% 0%,#182036 0%,transparent 60%),
+ linear-gradient(180deg,#111a2e 0%,var(--bg) 40%,var(--bg2) 100%)}
+nav{position:sticky;top:0;z-index:50;display:flex;justify-content:center;padding:14px 10px;
+ backdrop-filter:blur(10px);background:linear-gradient(180deg,rgba(9,13,24,.92),rgba(9,13,24,.5));
+ border-bottom:1px solid var(--line)}
+.pill{display:flex;gap:2px;padding:5px;border:1px solid var(--line-c);border-radius:999px;
+ background:rgba(21,29,46,.7);max-width:100%;overflow-x:auto;scrollbar-width:none}
+.pill::-webkit-scrollbar{display:none}
+.pill a{color:var(--slate);text-decoration:none;font-size:14px;font-weight:500;padding:8px 16px;
+ border-radius:999px;white-space:nowrap;transition:.25s;display:flex;align-items:center;gap:5px}
+.pill a:hover{color:var(--pearl-hi)}
+.pill a.on{color:#0d1220;background:linear-gradient(135deg,var(--pearl-hi),var(--champ));font-weight:700}
+.pill a .lk{font-size:11px;opacity:.7}
+section{max-width:1080px;margin:0 auto;padding:90px 22px}
+.head{text-align:center;margin-bottom:52px}
+.eyebrow{font-family:'Nanum Myeongjo',serif;letter-spacing:.5em;font-size:12px;color:var(--champ);
+ text-transform:uppercase;margin-bottom:14px;padding-left:.5em}
+.head h2{font-family:'Nanum Myeongjo',serif;font-size:2.5rem;font-weight:800;color:var(--pearl-hi);letter-spacing:.04em}
+.divide{width:0;height:1px;margin:18px auto 0;background:linear-gradient(90deg,transparent,var(--champ),transparent);transition:width 1s ease}
+.in-view .divide{width:120px}
+.head p{margin-top:16px;color:var(--slate);font-size:.95rem}
+.subhead{text-align:center;margin:70px 0 30px}
+.subhead .fl{color:var(--champ);font-size:1rem;margin:0 .5em;opacity:.8}
+.subhead h3{display:inline;font-family:'Nanum Myeongjo',serif;font-size:1.6rem;color:var(--pearl-hi)}
+.rv{opacity:0;transform:translateY(38px);transition:opacity .9s ease,transform .9s ease}
+.rv.in-view{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none}.divide{width:120px}}
+/* ── 히어로: 여백 없이 화면 꽉 채움 ── */
+.hero{position:relative;width:100%;height:100vh;height:100svh;min-height:480px;overflow:hidden}
+.hero picture,.hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center}
+.hero::after{content:"";position:absolute;inset:0;
+ background:linear-gradient(180deg,rgba(9,13,24,.25) 0%,transparent 30%,transparent 55%,rgba(9,13,24,.88) 100%)}
+.hero-txt{position:absolute;left:0;right:0;bottom:0;z-index:2;text-align:center;padding:0 22px 58px}
+.hero-txt .en{font-family:'UnifrakturMaguntia',serif;font-size:1.3rem;color:var(--champ);opacity:.9;margin-bottom:4px}
+.hero-txt h1{font-family:'Nanum Myeongjo',serif;font-size:3rem;font-weight:800;color:var(--pearl-hi);
+ letter-spacing:.08em;text-shadow:0 4px 24px rgba(0,0,0,.6);margin-bottom:14px}
+.hero-quote{font-family:'Nanum Myeongjo',serif;font-size:1.1rem;color:var(--pearl);max-width:640px;
+ margin:0 auto 8px;font-style:italic;opacity:.92;text-shadow:0 2px 12px rgba(0,0,0,.7)}
+.hero-sub{color:#b8c2d4;letter-spacing:.35em;font-size:12px;padding-left:.35em;text-shadow:0 2px 10px rgba(0,0,0,.7)}
+@media(max-width:600px){.hero-txt h1{font-size:2.2rem}.hero-quote{font-size:.98rem}}
+/* ── 세계관 ── */
+.lore-intro{max-width:720px;margin:0 auto 10px;text-align:center;color:#c3cede;font-size:1.05rem}
+.lore-intro .drop{font-family:'Nanum Myeongjo',serif;color:var(--champ);font-size:1.2rem;display:block;margin-bottom:8px}
+.lore-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.lore-card{border:1px solid var(--line);border-radius:14px;padding:26px 24px;
+ background:linear-gradient(160deg,var(--panel),rgba(21,29,46,.35));transition:.3s}
+.lore-card:hover{border-color:var(--line-c);transform:translateY(-3px)}
+.lore-card .ic{font-size:1.5rem;color:var(--champ);margin-bottom:14px;display:block}
+.lore-card h4{font-family:'Nanum Myeongjo',serif;font-size:1.2rem;color:var(--pearl-hi);margin-bottom:10px}
+.lore-card p{font-size:.92rem;color:#aab6c9;line-height:1.8}
+.factions{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.fcard{border:1px solid var(--line);border-radius:14px;padding:26px 26px;position:relative;overflow:hidden;
+ background:linear-gradient(160deg,var(--panel),rgba(21,29,46,.4));transition:.3s}
+.fcard:hover{border-color:var(--line-c);transform:translateY(-3px)}
+.fcard::before{content:"";position:absolute;top:0;left:0;width:3px;height:100%;background:linear-gradient(180deg,var(--champ),transparent)}
+.fcard .ft{font-size:11px;color:var(--champ);letter-spacing:.15em;margin-bottom:4px}
+.fcard h3{font-family:'Nanum Myeongjo',serif;font-size:1.4rem;color:var(--pearl-hi);margin-bottom:14px}
+.fcard p{font-size:.92rem;color:#aab6c9;line-height:1.8}
+/* ── 캐릭터 ── */
+.tabs{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-bottom:40px}
+.tab{font-family:'Nanum Myeongjo',serif;font-size:.95rem;color:var(--slate);cursor:pointer;padding:9px 18px;
+ border:1px solid var(--line);border-radius:999px;background:transparent;transition:.25s}
+.tab:hover{color:var(--pearl)}
+.tab.on{color:#0d1220;background:linear-gradient(135deg,var(--pearl-hi),var(--champ));border-color:transparent;font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:18px}
+.ccard{cursor:pointer;border-radius:12px;overflow:hidden;border:1px solid var(--line);background:var(--panel);transition:.3s}
+.ccard:hover{transform:translateY(-4px);border-color:var(--champ);box-shadow:0 14px 34px rgba(0,0,0,.45)}
+.ccard .imgw{aspect-ratio:832/1216;background:var(--panel2)}
+.ccard img{width:100%;height:100%;object-fit:contain;display:block;transition:.4s}
+.ccard:hover img{transform:scale(1.04)}
+.ccard .ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--slate);
+ background:repeating-linear-gradient(45deg,var(--panel),var(--panel) 6px,var(--panel2) 6px,var(--panel2) 12px)}
+.ccard .cap{padding:11px 12px 13px}
+.ccard .cap b{font-family:'Nanum Myeongjo',serif;font-size:1.05rem;color:var(--pearl-hi);font-weight:700}
+.ccard .cap span{display:block;font-size:11px;color:var(--champ);letter-spacing:.08em;margin-top:2px}
+/* ── 모달 ── */
+.lb{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;
+ background:rgba(6,9,18,.9);backdrop-filter:blur(8px);padding:20px}
+.lb.open{display:flex}
+.lbbox{position:relative;background:linear-gradient(160deg,var(--panel),var(--bg2));border:1px solid var(--line-c);
+ border-radius:18px;max-width:840px;width:100%;max-height:92vh;overflow:auto;padding:30px;
+ display:grid;grid-template-columns:300px 1fr;gap:28px}
+.lbclose{position:absolute;top:16px;right:18px;font-size:22px;color:var(--pearl);cursor:pointer;
+ background:rgba(9,13,24,.6);border:1px solid var(--line);border-radius:50%;width:34px;height:34px;line-height:1;z-index:2}
+.lb-main{border-radius:12px;overflow:hidden;border:1px solid var(--line-c);aspect-ratio:832/1216;background:var(--panel2)}
+.lb-main img{width:100%;height:100%;object-fit:contain}
+.lb-thumbs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
+.lb-thumbs .th{border-radius:7px;overflow:hidden;border:1px solid var(--line);cursor:pointer;background:var(--panel2);transition:.2s}
+.lb-thumbs .th.on{border-color:var(--champ)}
+.lb-thumbs .th img{width:100%;aspect-ratio:832/1216;object-fit:contain;display:block}
+.lb-thumbs .th .ph{aspect-ratio:832/1216;display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--slate);
+ background:repeating-linear-gradient(45deg,var(--panel),var(--panel) 6px,var(--panel2) 6px,var(--panel2) 12px)}
+.lb-thumbs .th .lab{font-size:9px;text-align:center;color:var(--slate);padding:2px 0 3px}
+.lb-info h3{font-family:'Nanum Myeongjo',serif;font-size:1.9rem;color:var(--pearl-hi);margin-bottom:10px}
+.badges{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+.badge{font-size:12px;padding:5px 13px;border-radius:999px;letter-spacing:.05em}
+.badge.f{color:#0d1220;background:linear-gradient(135deg,var(--pearl-hi),var(--champ));font-weight:700}
+.field{border:1px solid var(--line);border-radius:10px;padding:12px 15px;background:rgba(21,29,46,.5)}
+.field+.field{margin-top:10px}
+.field .lb-lab{font-size:10px;letter-spacing:.15em;color:var(--champ);margin-bottom:5px}
+.field .val{font-size:.92rem;color:var(--pearl)}
+@media(max-width:640px){.lbbox{grid-template-columns:1fr;padding:22px}}
+/* ── 웹툰 ── */
+.webtoon-wrap{max-width:820px;margin:0 auto;background:#050507;border:1px solid var(--line);
+ border-radius:14px;overflow:hidden}
+.webtoon-wrap img{width:100%;display:block}
+/* ── 봉인 ── */
+.locked{position:relative;border:1px solid var(--line);border-radius:16px;overflow:hidden;min-height:300px;
+ display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px 30px;
+ background:repeating-linear-gradient(135deg,rgba(0,0,0,.25),rgba(0,0,0,.25) 22px,transparent 22px,transparent 46px),
+ linear-gradient(160deg,var(--panel),var(--bg2))}
+.chain{font-size:2.6rem;letter-spacing:.3em;color:var(--champ-d);opacity:.7;margin-bottom:18px}
+.locked h3{font-family:'Nanum Myeongjo',serif;font-size:1.5rem;color:var(--pearl);margin-bottom:10px}
+.locked p{color:var(--slate);font-size:.92rem;max-width:420px}
+.lockbadge{position:absolute;top:16px;right:18px;font-size:12px;color:var(--champ);border:1px solid var(--line-c);
+ border-radius:999px;padding:4px 12px;letter-spacing:.1em}
+footer{text-align:center;padding:80px 22px 100px;border-top:1px solid var(--line);margin-top:40px}
+footer .fl{font-family:'UnifrakturMaguntia',serif;font-size:2rem;color:var(--pearl-hi);margin-bottom:8px}
+footer .fq{color:var(--slate);font-size:.9rem}
+footer .cr{margin-top:36px;font-size:11px;color:#4b566e;letter-spacing:.1em}
+#bgm{position:fixed;bottom:22px;right:22px;z-index:60;width:52px;height:52px;border-radius:50%;
+ border:1px solid var(--line-c);background:rgba(21,29,46,.85);color:var(--champ);font-size:20px;cursor:pointer;
+ backdrop-filter:blur(6px);transition:.3s}
+#bgm:hover{color:var(--pearl-hi);transform:scale(1.06)}
+#bgm.playing{box-shadow:0 0 0 4px rgba(216,201,160,.15)}
+@media(max-width:600px){.head h2{font-size:2rem}section{padding:66px 16px}.grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}}
+</style></head><body>
+<nav><div class="pill">
+ <a href="#main" class="on">메인</a><a href="#worldview">세계관</a><a href="#character">캐릭터</a>
+ <a href="#webtoon">웹툰</a><a href="#map">제국지도<span class="lk">&#128274;</span></a>
+</div></nav>
+
+<header class="hero" id="main">
+ <picture>
+  <source media="(orientation: portrait)" srcset="img/Hero_2.webp">
+  <img src="img/Hero_3.webp" alt="트리아 제국 — 알트하벤 전경">
+ </picture>
+ <div class="hero-txt">
+  <div class="en">Tria Empire</div>
+  <h1>트리아 제국</h1>
+  <p class="hero-quote">&ldquo;예술이 곧 권능인 제국에서, 재능은 축복이자 형벌이다.&rdquo;</p>
+  <p class="hero-sub">THE LAND OF GOLD AND ART</p>
+ </div>
+</header>
+
+<section id="worldview">
+ <div class="head"><div class="eyebrow">Worldview</div><h2>세계관</h2><div class="divide"></div>
+  <p>마법이 곧 예술의 다른 이름인 나라</p></div>
+ <div class="lore-intro rv"><span class="drop">붓끝에서 장미가 피고, 활 하나로 겨울이 온다.</span>
+  트리아 제국에서 마법은 예술과 구분되지 않는다. 아름다움을 빚어내는 모든 손끝이 곧 권능이며, 재능을 타고난 이들은 저마다의 이름으로 이 세계를 물들이고 있다.</div>
+ <div class="subhead"><span class="fl">&#10022;</span><h3>설정 개요</h3><span class="fl">&#10022;</span></div>
+ <div class="lore-grid" id="lore-grid"></div>
+ <div class="subhead"><span class="fl">&#9819;</span><h3>주요 세력</h3><span class="fl">&#9819;</span></div>
+ <div class="factions" id="fcards"></div>
+</section>
+
+<section id="character">
+ <div class="head"><div class="eyebrow">Characters</div><h2>캐릭터</h2><div class="divide"></div></div>
+ <div class="tabs" id="tabs"></div>
+ <div class="grid" id="grid"></div>
+</section>
+
+<section id="webtoon">
+ <div class="head"><div class="eyebrow">Webtoon</div><h2>웹툰</h2><div class="divide"></div>
+  <p>프롤로그 &mdash; 그리고, 아르테</p></div>
+ <div class="webtoon-wrap rv">
+  <img loading="lazy" src="img/1.webp" alt="웹툰 1">
+  <img loading="lazy" src="img/2.webp" alt="웹툰 2">
+  <img loading="lazy" src="img/3.webp" alt="웹툰 3">
+  <img loading="lazy" src="img/4.webp" alt="웹툰 4">
+  <img loading="lazy" src="img/5.webp" alt="웹툰 5">
+ </div>
+</section>
+
+<section id="map">
+ <div class="head"><div class="eyebrow">Imperial Map</div><h2>제국지도</h2><div class="divide"></div></div>
+ <div class="locked rv"><div class="lockbadge">&#128274; 봉인</div><div class="chain">&#9939; &#9939; &#9939;</div>
+  <h3>봉인된 지도</h3><p>제국의 영지와 세력의 판도가 아직 봉인되어 있습니다. 세계가 무르익으면, 지도 위의 사슬이 하나씩 풀립니다.</p></div>
+</section>
+
+<footer><div class="fl">Tria Empire</div>
+ <div class="fq">이야기는 여기서, 당신의 손으로 이어집니다.</div>
+ <div class="cr">TRIA EMPIRE &middot; A WORLD WHERE MAGIC IS ART</div></footer>
+
+<div class="lb" id="lb"><div class="lbbox">
+ <button class="lbclose">&times;</button>
+ <div class="lb-gallery">
+  <div class="lb-main"><img id="lb-main-img" alt=""></div>
+  <div class="lb-thumbs" id="lb-thumbs"></div>
+ </div>
+ <div class="lb-info">
+  <h3 id="lb-name"></h3>
+  <div class="badges" id="lb-badges"></div>
+  <div class="field"><div class="lb-lab">나이 / 성별</div><div class="val" id="lb-meta"></div></div>
+  <div class="field"><div class="lb-lab">외모 / 복장</div><div class="val" id="lb-look"></div></div>
+  <div class="field"><div class="lb-lab">PERSONALITY</div><div class="val" id="lb-pers"></div></div>
+  <div class="field"><div class="lb-lab">한 줄 소개</div><div class="val" id="lb-line"></div></div>
+ </div>
+</div></div>
+
+<button id="bgm" title="배경음악">&#9834;</button>
+<script>
+window.TRIA={
+emo:["대화","기쁨","부끄러움","슬픔","불안","아픔","분노"],
+loreCards:[
+["&#10022;","마법은 곧 예술","트리아에서 마법과 예술은 구분되지 않는다. 붓질 한 번에 장미가 실제로 피고, 활 하나가 겨울을 부른다. 아름다움을 빚어내는 모든 손끝이 곧 권능이며, 걸작(傑作)일수록 강대한 힘이 된다."],
+["&#9819;","알트하벤 — 제국의 심장","&lsquo;오래된 안식처&rsquo;라 불리는 제국의 수도. 첨탑과 대성당이 노을을 가르고, 강물 위로 예술가들의 살롱과 극장이 밤새 불을 밝힌다. 제국의 모든 재능이 이곳으로 흘러든다."],
+["&#9670;","재능이 곧 신분","트리아의 계급은 핏줄이 아니라 재능으로 갈린다. 위대한 작품을 남긴 자는 귀족이 되고, 재능이 마른 가문은 몰락한다. 그래서 이곳의 아름다움에는 늘 절박함이 배어 있다."],
+["&#10059;","상상(想像)","마법을 발동시키는 원인은 상상이다. 이루려는 광경을 머릿속에 얼마나 또렷하고 선명하게 떠올리느냐 — 그것이 마법의 성패를 가른다. 흐릿한 상상은 흐릿한 마법밖에 낳지 못하고, 완성된 심상은 그대로 세계에 구현된다. 그래서 트리아에서 예술 수업은 곧 마법 수업이다."],
+["&#9733;","황금기의 이면","제국은 가장 눈부신 황금기를 누리고 있다. 허나 찬란한 빛에는 반드시 그늘이 진다. 팔리지 못한 재능, 금지된 예술, 왕관을 노리는 손 &mdash; 아름다운 궁정의 아래에서 무언가가 천천히 저물고 있다."],
+["&#9789;","저무는 빛","오래된 예언은 말한다. &lsquo;가장 찬란한 빛은, 늘 저물 것을 안다.&rsquo; 세계를 굽어보는 어떤 존재는 이미 그 끝을 보았고 &mdash; 지금, 문이 다시 열리려 하고 있다."]],
+factions:[
+{disp:"황실",sub:"제국의 정점",body:"트리아를 다스리는 지고(至高)의 혈통. 재능 없이 옥좌에 오른 어린 여제와, 그녀를 각자의 방식으로 지탱하는 사람들이 있다. 가장 세련된 우아함 뒤에서, 왕관의 무게가 조용히 흔들린다.",chars:[
+{name:"테오도라",meta:"1480년생 · 女 · 159cm · 47kg",look:"금발 · 앳된 체구 · 총명한 눈 · 단정히 갖춰 입은 황금 예복",pers:"따뜻하고 겸손, 결정적인 순간엔 위엄",line:"재능 없이 옥좌에 오른 여제. 밤마다 흔들리면서도, 어진 군주이려 애쓴다."},
+{name:"콘스탄체",meta:"1477년생 · 女 · 164cm · 53kg",look:"단정한 금발 · 차분한 기품 · 실무적인 예복",pers:"침착, 다정한 경어",line:"동생의 그릇을 알아보고 물러난 황녀. 자신을 지운 자리에서 제국의 실무를 떠받친다."},
+{name:"막시밀리안",meta:"1475년생 · 男 · 184cm · 76kg",look:"황금을 흐트러짐 없이 두른 위압적 귀공자 · 날카로운 눈매",pers:"밖에선 단호하고 위압적, 가족 앞에선 부드러움",line:"안에서만 다정한 황자. 밖에서는 힘으로 황실을 증명한다."},
+{name:"힐데가르트",meta:"1473년생 · 女 · 172cm · 62kg",look:"실용적인 갑주와 검 · 화려함 없이 단단하고 정갈한 차림",pers:"짧고 단정한 무인의 말투, 여제 앞에서만 풀어짐",line:"평민에서 근위대장까지. 알아봐 준 은혜에 바치는 충성은, 신하의 것 이상으로 애틋하다."},
+{name:"비올라",meta:"1479년생 · 女 · 160cm · 48kg",look:"소박하나 기품 있는 옷 · 늘 지니고 다니는 현악기",pers:"충직하고 정중, 예술가의 자긍심",line:"천출의 설움을 아는 궁정 예술가. 결핍을 아는 여제와 서로를 알아보았다."}]},
+{disp:"폰 클랑",sub:"선율의 가문",body:"소리로 마법을 빚는 선율(旋律)의 명가. 완벽한 프리마돈나 후계와, 그 완벽에 질려버린 둘째가 한 지붕 아래 산다. 가문의 연주는 흠잡을 데 없이 아름답고 &mdash; 그래서 더 공허하다.",chars:[
+{name:"이졸데",meta:"1480년생 · 女 · 165cm · 50kg",look:"우아한 금발 · 화려한 연주복 · 흐트러짐 없는 자세",pers:"자신만만, 기품",line:"가문의 후계이자 흠 없는 프리마돈나. 완벽이라는 무대 아래는 텅 비어 있다."},
+{name:"레오노레",meta:"1482년생 · 女 · 161cm · 49kg",look:"수수한 차림을 선호 · 자유분방한 분위기",pers:"솔직, 반항적",line:"가문의 오만에 질린 둘째. 거리의 진짜 아름다움을 동경한다."}]},
+{disp:"폰 글란츠",sub:"색채의 가문",body:"색으로 세계를 물들이는 색채(色彩)의 명가. 색을 발판 삼아 정점을 노리는 야심과, 상품이 된 예술에 환멸을 느끼는 순수가 나란히 붓을 든다.",chars:[
+{name:"잉그리트",meta:"1478년생 · 女 · 167cm · 52kg",look:"화려한 색채의 드레스 · 계산된 미모",pers:"우아하나 계산적",line:"가문의 후계. 색채를 발판 삼아, 가문을 제국의 정점에 올리려는 야심가."},
+{name:"헬레네",meta:"1482년생 · 女 · 159cm · 47kg",look:"물감 묻은 작업복 · 예민한 눈",pers:"조용, 예민",line:"물감이 마르지 않는 순수한 천재. 상품이 된 예술에 환멸을 느낀다."}]},
+{disp:"폰 펠스",sub:"형상의 가문",body:"돌과 쇠에 형태를 새기는 형상(形象)의 명가. 투박하다는 조롱을 견뎌 온 단단한 손들이, 궁정의 어떤 세공보다 오래 남을 것을 빚는다.",chars:[
+{name:"브륀힐데",meta:"1479년생 · 女 · 170cm · 58kg",look:"다부진 체구 · 작업복 · 거친 손",pers:"무뚝뚝, 단답",line:"투박하다는 무시에 이골이 난 후계자. 단단한 겉 속엔 인정받고 싶은 마음이 있다."},
+{name:"아가테",meta:"1483년생 · 女 · 154cm · 43kg",look:"작은 체구 · 기계 부품을 만지작거리는 손 · 몰입한 눈",pers:"느릿한 말투, 혼잣말",line:"사람보다 피조물에게 먼저 마음을 여는 괴짜 천재."}]},
+{disp:"폰 아이트",sub:"운율의 가문",body:"말과 글, 그리고 맹세를 다루는 운율(韻律)의 명가. 웃으며 옭아매는 언변의 지배자와, 태생의 어두운 맹세에 얽매인 둘째. 이 가문에서 말은 장식이 아니라 계약이다.",chars:[
+{name:"카타리나",meta:"1477년생 · 女 · 166cm · 51kg",look:"우아한 정장풍 드레스 · 손에서 놓지 않는 서적 · 미소",pers:"우아하고 정교한 언변",line:"가문의 후계. 웃는 얼굴로 상대를 옭아매는 언어의 지배자."},
+{name:"시빌레",meta:"1482년생 · 女 · 160cm · 48kg",look:"창백한 낯빛 · 그늘진 분위기 · 몸에 새겨진 맹세 문양",pers:"조용, 체념",line:"가문의 둘째. 태어날 때부터 얽힌 어두운 맹세에서 벗어나기를 갈망한다."}]},
+{disp:"아카데미",sub:"재능을 벼리는 곳",body:"제국 최고의 예술 학부이자, 다섯 세력의 각축 속에서 자치를 지켜 온 요람. 신분의 벽을 부수려는 평민 천재부터 규율을 비웃는 교수까지, 재능이라는 이름의 모든 것이 이곳에서 부딪힌다.",chars:[
+{name:"에른스트",meta:"1481년생 · 男 · 179cm · 71kg",look:"낡은 옷 · 다부진 체격 · 형형한 눈",pers:"거칠고 직선적, 뜨거움",line:"신분의 벽을 부수려는 평민 천재. 강하지만 투박한 분노의 투사."},
+{name:"힐트루트",meta:"1472년생 · 女 · 168cm · 55kg",look:"학자풍 정장 · 피로가 밴 기품",pers:"노련, 중립적 경어",line:"다섯 세력의 각축 속에서 아카데미의 자치를 지키는 젊은 총장."},
+{name:"로잘린데",meta:"1475년생 · 女 · 166cm · 51kg",look:"자유분방한 차림 · 손에서 떠나지 않는 악기",pers:"활기, 자유분방",line:"규율을 거부하는 선율 교수. 즉흥이야말로 자유라 믿는다."},
+{name:"마르가레테",meta:"1476년생 · 女 · 167cm · 52kg",look:"화려한 색채의 옷 · 사교적인 미소",pers:"사교적, 유려",line:"화려하고 사교적인 색채 교수. 진심은 언제나 색 뒤에 감춘다."},
+{name:"테클라",meta:"1474년생 · 女 · 171cm · 60kg",look:"작업복 · 거친 손 · 무표정",pers:"과묵, 짧은 말",line:"말 대신 손으로 증명하는 과묵한 형상 교수."},
+{name:"도로테아",meta:"1475년생 · 女 · 165cm · 50kg",look:"단정한 정장 · 서적",pers:"냉철, 정확",line:"말이 곧 계약인 냉철한 운율 교수. 속내를 읽은 자는 아직 없다."},
+{name:"엘프리데",meta:"1476년생 · 女 · 162cm · 49kg",look:"어두운 로브 · 창백하고 신비로운 인상",pers:"은밀, 조용",line:"비전(祕傳)을 둘러싼 암투의 문지기. 모든 비밀을 쥔 만큼 고독한 사서."},
+{name:"파니",meta:"1482년생 · 女 · 156cm · 44kg",look:"헝클어진 머리 · 작업에 몰두한 무심한 얼굴",pers:"무심, 단편적인 말",line:"세상에 무심한 은둔 기인. 오직 예술에만 미쳐 있다."}]},
+{disp:"교단",sub:"신을 기다리는 자들",body:"아름다움 그 자체를 신으로 섬기는 조직. 전통을 지키려는 정통파와 소박한 신앙의 개혁파가 갈라선 가운데, 정작 교황은 &mdash; 아직 한 번도 신을 만나지 못했다.",chars:[
+{name:"가브리엘",meta:"1476년생 · 男 · 181cm · 72kg",look:"절제된 성의(聖衣) · 젊은 얼굴에 고요하고 깊은 눈",pers:"고요, 사려 깊은 경어",line:"신을 만나지 못한 채 신을 섬기는 교황. 여제를 향한 마음을 억누른 고독한 중재자."},
+{name:"세라피나",meta:"1474년생 · 女 · 167cm · 53kg",look:"화려하고 장중한 성직 예복",pers:"확고, 완고",line:"전통이 곧 경배라 믿는 정통파의 수장."},
+{name:"요한나",meta:"1475년생 · 女 · 165cm · 51kg",look:"소박한 수도복",pers:"열정, 카리스마",line:"소박한 신앙으로 사람을 모으는 개혁파의 카리스마."},
+{name:"로자",meta:"1483년생 · 女 · 158cm · 46kg",look:"검소한 수녀복",pers:"겸손, 성실",line:"밑바닥에서 올라온 성직자. 그 신앙이 순수인지 야심인지는 아직 모른다."},
+{name:"미카엘라",meta:"1477년생 · 女 · 170cm · 59kg",look:"성기사 갑주 · 성(聖) 문양",pers:"과묵, 경건",line:"신앙과 무예를 한 자루 검에 벼린 성기사. 의무에 충실하다."},
+{name:"유디트",meta:"1478년생 · 女 · 163cm · 50kg",look:"수수한 사제복 · 눈에 띄지 않는 인상",pers:"은밀, 헌신",line:"그림자처럼 교황 곁을 지키는 말 없는 충성."}]},
+{disp:"용병",sub:"계약 위의 검",body:"계약과 실력만을 믿는 검. 제국의 위계 바깥에 선 최강자와, 밑바닥에서 기어오른 신예가 여기 있다. 값을 치르면 검을 들고, 값이 끝나면 돌아선다.",chars:[
+{name:"군다",meta:"1472년생 · 女 · 174cm · 64kg",look:"실전 갑주 · 몸에 새겨진 상처 · 서늘한 기품",pers:"무심, 짧고 서늘한 말",line:"계약과 실력 외엔 무심한 용병단장. 제국의 위계 바깥에 선 최강자."},
+{name:"레나",meta:"1482년생 · 女 · 164cm · 54kg",look:"낡은 가죽 갑옷 · 거친 인상",pers:"거칠고 곧음",line:"밑바닥에서 기어오른 신예. 귀족을 향한 반발이 검을 벼린다."}]},
+{disp:"기사",sub:"명예의 갑주",body:"명예를 갑주처럼 두른 제국의 검. 허나 화려한 문장 아래에는 실전에서 밀리고 있다는 불안이 자란다. 이상과 현실 사이에서, 기사도는 시험받고 있다.",chars:[
+{name:"아델하이트",meta:"1476년생 · 女 · 169cm · 57kg",look:"화려한 기사 갑주 · 귀족 문장",pers:"자부심, 격식",line:"명예의 화신인 기사단장. 실전에서 밀린다는 불안을 갑주 안에 감춘다."},
+{name:"클라우디아",meta:"1481년생 · 女 · 165cm · 52kg",look:"정갈한 기사복 · 앳된 얼굴",pers:"정중하나 미숙",line:"미완의 젊은 기사. 그 곧음이 이상인지 오만인지는 아직 모른다."}]},
+{disp:"유랑",sub:"길 위의 무대",body:"등급도 신분도 없는 자들이 모인 길 위의 극단. 제국의 눈이 닿지 않는 변두리를 떠돌며 무대를 세운다. 그리고 이 극단은 &mdash; 세계에서 가장 큰 비밀 하나를 품고 있다.",chars:[
+{name:"베라",meta:"1475년생 · 女 · 166cm · 51kg",look:"화려하나 낡은 무대 의상 · 풍파를 아는 눈",pers:"능란, 유들유들",line:"자유와 고단함을 함께 짊어진 극단장. 위계를 등진 과거가 있다."},
+{name:"비앙카",meta:"1482년생 · 女 · 162cm · 48kg",look:"눈부신 무대 의상과 화장",pers:"무대에선 화려, 무대 뒤에선 조용",line:"무대 위에선 가장 빛나고, 무대 뒤에선 가장 외로운 간판 배우."},
+{name:"엘라",meta:"출생 미상(외견 19세) · 女 · 161cm · 49kg",look:"창백한 미모 · 붉은 눈 · 이국적 무대 의상으로 정체를 위장",pers:"조용, 경계",line:"시들지 않는 이질적인 아름다움. 그 정체를 무대 의상 아래 감춘, 쫓기는 도피자."},
+{name:"카산드라",meta:"1476년생 · 女 · 164cm · 50kg",look:"신비로운 점술사 복장 · 베일",pers:"모호, 신비",line:"신의 그림자가 스치는 점쟁이. 사기인지 예언인지 아무도 모른다."}]},
+{disp:"암시장",sub:"빛이 닿지 않는 거래",body:"제국의 법이 닿지 않는 뒷세계. 노예와 정보, 위조된 걸작까지 &mdash; 팔려선 안 될 것들이 은밀히 값을 단다. 빛의 제국이 외면한 것들은 전부 이곳으로 흘러든다.",chars:[
+{name:"오틸리에",meta:"1475년생 · 女 · 166cm · 51kg",look:"값비싸나 무채색의 의상 · 차가운 눈",pers:"냉담, 사무적",line:"감정을 지운 냉혹한 노예상. 사람마저 값으로 매긴다."},
+{name:"바네사",meta:"1478년생 · 女 · 173cm · 63kg",look:"야성적 인상 · 짐승 귀 · 몸의 상처 · 거친 차림",pers:"사납고 직설적",line:"착취에 이빨을 드러낸 수인(獸人) 복수자."},
+{name:"힐다",meta:"1474년생 · 女 · 163cm · 50kg",look:"눈에 띄지 않는 수수함 · 날카로운 눈",pers:"영리, 중립",line:"지배하지 않고도 모든 비밀을 쥔 뒷세계의 실세."},
+{name:"마틸데",meta:"1479년생 · 女 · 157cm · 48kg",look:"후줄근한 차림 · 섬세한 손 · 냉소",pers:"냉소, 그림자",line:"빛 아래 서지 못한 위조의 천재. 에른스트의 어두운 거울."}]},
+{disp:"선단",sub:"바다 너머의 야심",body:"바닷길을 쥐고 제국 너머를 꿈꾸는 자들. 바다의 왕을 자처하는 무법의 선단장 아래, 정복과 교감 사이에서 흔들리는 이들이 함께 항해한다. 수평선 너머에서 무언가가 실려 온다.",chars:[
+{name:"레온하르트",meta:"1473년생 · 男 · 186cm · 80kg",look:"항해복 · 햇볕에 그은 피부 · 야성적 인상",pers:"호탕, 거침없음",line:"바다의 왕을 꿈꾸는 무법의 선단장."},
+{name:"나디아",meta:"1478년생 · 女 · 165cm · 51kg",look:"이국적 차림 · 혼혈의 인상",pers:"차분, 사려 깊음",line:"두 세계 사이에 낀 통역자. 정복과 교감 사이에서 흔들린다."},
+{name:"프리다",meta:"1482년생 · 女 · 162cm · 49kg",look:"활동적인 항해복 · 밝은 눈",pers:"밝고 순수",line:"미지를 동경하는 젊은 항해사. 바다의 어둠은 아직 모른다."},
+{name:"레기나",meta:"1479년생 · 女 · 164cm · 50kg",look:"학자풍 차림 · 기록 도구와 이국의 수집품",pers:"탐구적, 수다",line:"이단시되는 앎마저 탐하는 박물학자."},
+{name:"거트루드",meta:"1475년생 · 女 · 170cm · 60kg",look:"거친 사냥꾼 차림 · 무기 · 냉담한 눈",pers:"냉담, 건조",line:"죄책감을 돈으로 덮는 노예사냥꾼. 선단의 어두운 공급자."}]},
+{disp:"???",sub:"",body:"",hidden:true,chars:[
+{name:"아르테",meta:"출생 미상 · 女",look:"회백색에 분홍빛이 스민 머리 · 별 장식의 흰 드레스 · 노을빛 눈동자",pers:"천진난만, 초연, 장난스러움",line:"세계를 굽어보는 어린 신. 이 세계의 어떤 잣대로도 잴 수 없는 색을, 그 아이만 알고 있었다."}]}
+]};
+const T=window.TRIA;
+const imgOf=(name,emo)=>`img/${name}_${emo}.webp`;
+// lore cards
+const lg=document.getElementById('lore-grid');
+T.loreCards.forEach(([ic,title,body])=>{
+ const el=document.createElement('div');el.className='lore-card rv';
+ el.innerHTML=`<span class="ic">${ic}</span><h4>${title}</h4><p>${body}</p>`;
+ lg.appendChild(el);
+});
+// faction lore cards (hidden 그룹 제외)
+const fc=document.getElementById('fcards');
+T.factions.filter(f=>!f.hidden).forEach(f=>{
+ const el=document.createElement('div');el.className='fcard rv';
+ el.innerHTML=`<div class="ft">${f.sub}</div><h3>${f.title||f.disp}</h3><p>${f.body}</p>`;
+ fc.appendChild(el);
+});
+// char tabs + grid
+const tabs=document.getElementById('tabs'),grid=document.getElementById('grid');
+function render(i){
+ [...tabs.children].forEach((t,j)=>t.classList.toggle('on',i===j));
+ grid.innerHTML='';
+ T.factions[i].chars.forEach(c=>{
+  const card=document.createElement('div');card.className='ccard';
+  card.innerHTML=`<div class="imgw"><img loading="lazy" src="${imgOf(c.name,'대화')}" alt="${c.name}"
+    onerror="this.outerHTML='<div class=&quot;ph&quot;>준비중</div>'"></div>
+   <div class="cap"><b>${c.name}</b><span>${T.factions[i].disp}</span></div>`;
+  card.onclick=()=>openLb(c,T.factions[i].disp);
+  grid.appendChild(card);
+ });
+}
+T.factions.forEach((f,i)=>{
+ const t=document.createElement('button');t.className='tab'+(i===0?' on':'');t.textContent=f.disp;
+ t.onclick=()=>render(i);tabs.appendChild(t);
+});
+render(0);
+// modal
+const lb=document.getElementById('lb');
+function openLb(c,fdisp){
+ const main=document.getElementById('lb-main-img');
+ function setMain(emo){main.src=imgOf(c.name,emo);main.onerror=()=>{main.removeAttribute('src');};}
+ setMain('대화');
+ const tb=document.getElementById('lb-thumbs');tb.innerHTML='';
+ T.emo.forEach((emo,idx)=>{
+  const th=document.createElement('div');th.className='th'+(idx===0?' on':'');
+  th.innerHTML=`<img src="${imgOf(c.name,emo)}" onerror="this.outerHTML='<div class=&quot;ph&quot;>준비중</div>'">`+
+   `<div class="lab">${emo}</div>`;
+  th.onclick=()=>{[...tb.children].forEach(x=>x.classList.remove('on'));th.classList.add('on');setMain(emo);};
+  tb.appendChild(th);
+ });
+ document.getElementById('lb-name').textContent=c.name;
+ document.getElementById('lb-badges').innerHTML=`<span class="badge f">${fdisp}</span>`;
+ document.getElementById('lb-meta').textContent=c.meta||'—';
+ document.getElementById('lb-look').textContent=c.look||'—';
+ document.getElementById('lb-pers').textContent=c.pers||'—';
+ document.getElementById('lb-line').textContent=c.line||'—';
+ lb.classList.add('open');
+}
+lb.onclick=e=>{if(e.target===lb||e.target.classList.contains('lbclose'))lb.classList.remove('open');};
+document.addEventListener('keydown',e=>{if(e.key==='Escape')lb.classList.remove('open');});
+// reveal
+const io=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting)x.target.classList.add('in-view');}),{threshold:.12});
+document.querySelectorAll('.rv,.head').forEach(el=>io.observe(el));
+// nav active
+const links=[...document.querySelectorAll('.pill a')];
+const secs=links.map(a=>document.querySelector(a.getAttribute('href')));
+window.addEventListener('scroll',()=>{let cur=0;secs.forEach((s,i)=>{if(s&&s.getBoundingClientRect().top<160)cur=i;});
+ links.forEach((a,i)=>a.classList.toggle('on',i===cur));});
+// bgm
+const audio=new Audio('bgm.mp3');audio.loop=true;
+const btn=document.getElementById('bgm');
+btn.onclick=()=>{if(audio.paused){audio.play().then(()=>{btn.textContent='♪';btn.classList.add('playing');}).catch(()=>{});}
+ else{audio.pause();btn.textContent='♫';btn.classList.remove('playing');}};
+</script>
+</body></html>
