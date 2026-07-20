@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>알트하벤 지도 — 트리아 제국</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Noto+Serif+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* ===== 색 토큰 (고지도·양피지·금박·봉랍 결) ===== */
+    --parchment: #EBE0C8;
+    --parchment-dark: #DDCEA8;
+    --ink: #241D14;
+    --gold: #B8863B;
+    --gold-bright: #D9AE5F;
+    --wine: #6E2A2A;
+    --verdigris: #4A6B5C;
+    --charcoal: #14100A;
+
+    --font-kr: 'Noto Serif KR', serif;
+    --font-latin: 'Cormorant Garamond', serif;
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{height:100%;}
+  body{
+    font-family: var(--font-kr);
+    background: var(--charcoal);
+    color: var(--parchment);
+    overflow:hidden;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.01ms !important; transition-duration:0.01ms !important;}
+  }
+
+  /* ===== 전체 스테이지 ===== */
+  .stage{
+    position:relative;
+    width:100vw; height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+
+  /* ===== 지도 캔버스 =====
+     .map-bg는 배경 레이어 2겹 구조입니다:
+       1겹(위) — url('알트하벤_배경.webp') 실제 일러스트
+       2겹(아래) — 양피지 톤 그라데이션 (파일이 아직 없거나 로드 실패 시 자동 대체)
+     파일명을 바꾸고 싶으면 이 두 줄의 url() 안쪽만 수정하세요.
+     절대 background: 축약 속성으로 통째로 덮어쓰지 마세요 — 폴백이 사라집니다.
+  */
+  .map-frame{
+    position:relative;
+    width:min(94vw, 1400px);
+    aspect-ratio: 16/10;
+    border-radius:2px;
+    overflow:hidden;
+    box-shadow:
+      0 0 0 1px rgba(184,134,59,.5),
+      0 0 0 10px var(--charcoal),
+      0 0 0 11px rgba(184,134,59,.35),
+      0 30px 80px rgba(0,0,0,.7);
+  }
+
+  .map-bg{
+    position:absolute; inset:0;
+    background-image: url('알트하벤_배경.webp'),
+      radial-gradient(ellipse at 30% 20%, #F1E6C8 0%, var(--parchment) 45%, var(--parchment-dark) 100%);
+    background-size:cover, cover;
+    background-position:center, center;
+  }
+
+  /* 양피지 질감 (노이즈) */
+  .map-texture{
+    position:absolute; inset:0;
+    opacity:.5;
+    mix-blend-mode:multiply;
+    pointer-events:none;
+  }
+
+  /* 가장자리 비네트 */
+  .map-vignette{
+    position:absolute; inset:0;
+    background: radial-gradient(ellipse at center, transparent 55%, rgba(20,16,10,.55) 100%);
+    pointer-events:none;
+  }
+
+  /* 플레이스홀더 고지도 라인아트 (SVG) */
+  .map-linework{ position:absolute; inset:0; opacity:.4; }
+
+  /* ===== 타이틀 ===== */
+  .map-title{
+    position:absolute; top:5%; left:50%; transform:translateX(-50%);
+    text-align:center;
+    pointer-events:none;
+    z-index:5;
+  }
+  .map-title .eyebrow{
+    font-family: var(--font-latin);
+    font-size:.78rem;
+    letter-spacing:.42em;
+    text-transform:uppercase;
+    color: var(--wine);
+    font-weight:600;
+  }
+  .map-title h1{
+    font-family: var(--font-kr);
+    font-weight:700;
+    font-size:clamp(1.6rem, 3.2vw, 2.6rem);
+    color: var(--ink);
+    letter-spacing:.08em;
+    margin-top:.2rem;
+    text-shadow: 0 1px 0 rgba(255,255,255,.25);
+  }
+  .map-title .sub{
+    font-family: var(--font-latin);
+    font-style:italic;
+    font-size:.95rem;
+    color: var(--ink);
+    opacity:.65;
+    margin-top:.15rem;
+  }
+
+  /* ===== 나침반 장식 ===== */
+  .compass{
+    position:absolute; right:4%; bottom:5%;
+    width:min(9vw, 92px); height:min(9vw, 92px);
+    opacity:.55;
+    pointer-events:none;
+  }
+
+  /* ===== 핫스팟(밀랍 인장) ===== */
+  .hotspot{
+    position:absolute;
+    width:46px; height:46px;
+    transform:translate(-50%,-50%);
+    border-radius:50%;
+    border:none;
+    cursor:pointer;
+    background:
+      radial-gradient(circle at 34% 30%, #8C3A3A 0%, var(--wine) 55%, #4B1717 100%);
+    box-shadow:
+      0 0 0 2px rgba(20,16,10,.55),
+      0 0 0 4px rgba(184,134,59,.55),
+      0 4px 10px rgba(0,0,0,.5);
+    display:flex; align-items:center; justify-content:center;
+    color: var(--gold-bright);
+    font-family: var(--font-latin);
+    font-size:1.15rem;
+    transition: transform .25s ease, box-shadow .25s ease;
+  }
+  .hotspot::after{
+    content:'';
+    position:absolute; inset:-9px;
+    border-radius:50%;
+    border:1px solid rgba(184,134,59,.35);
+  }
+  .hotspot:hover, .hotspot:focus-visible{
+    transform:translate(-50%,-50%) scale(1.12);
+    box-shadow:
+      0 0 0 2px rgba(20,16,10,.55),
+      0 0 0 4px rgba(217,174,95,.9),
+      0 6px 16px rgba(0,0,0,.55);
+    outline:none;
+  }
+  .hotspot.active{
+    box-shadow:
+      0 0 0 2px rgba(20,16,10,.6),
+      0 0 0 5px var(--gold-bright),
+      0 0 22px rgba(217,174,95,.8);
+  }
+  .hotspot .pulse{
+    position:absolute; inset:-9px;
+    border-radius:50%;
+    border:1px solid var(--gold-bright);
+    opacity:0;
+  }
+  .hotspot:hover .pulse{
+    animation: pulse 1.6s ease-out infinite;
+  }
+  @keyframes pulse{
+    0%{ transform:scale(.85); opacity:.7; }
+    100%{ transform:scale(1.5); opacity:0; }
+  }
+
+  .hotspot-label{
+    position:absolute;
+    top:100%; left:50%; transform:translate(-50%, 6px);
+    font-family: var(--font-kr);
+    font-size:.74rem;
+    font-weight:600;
+    color: var(--ink);
+    white-space:nowrap;
+    background: rgba(235,224,200,.88);
+    padding:2px 8px;
+    border-radius:2px;
+    border:1px solid rgba(184,134,59,.4);
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .2s ease;
+  }
+  .hotspot:hover ~ .hotspot-label,
+  .hotspot:focus-visible ~ .hotspot-label{ opacity:1; }
+
+  /* ===== 정보 패널 (양피지 두루마리) ===== */
+  .panel-overlay{
+    position:fixed; inset:0;
+    background: rgba(20,16,10,.55);
+    opacity:0; pointer-events:none;
+    transition:opacity .3s ease;
+    z-index:20;
+  }
+  .panel-overlay.open{ opacity:1; pointer-events:auto; }
+
+  .panel{
+    position:fixed;
+    top:0; right:0; bottom:0;
+    width:min(420px, 92vw);
+    background: linear-gradient(180deg, #F1E6C8 0%, var(--parchment) 100%);
+    color: var(--ink);
+    box-shadow: -8px 0 40px rgba(0,0,0,.5), inset 1px 0 0 rgba(184,134,59,.6);
+    transform: translateX(100%);
+    transition: transform .4s cubic-bezier(.16,.84,.44,1);
+    z-index:21;
+    padding: 2.4rem 2rem;
+    overflow-y:auto;
+  }
+  .panel.open{ transform:translateX(0); }
+
+  .panel-image{
+    position:relative;
+    width:100%;
+    aspect-ratio: 832/1216;
+    max-height:46vh;
+    border-radius:4px;
+    overflow:hidden;
+    margin-bottom:1.3rem;
+    box-shadow: 0 0 0 1px rgba(184,134,59,.55), 0 0 0 5px var(--parchment), 0 0 0 6px rgba(184,134,59,.4), 0 10px 26px rgba(0,0,0,.35);
+  }
+  .panel-image img{ width:100%; height:100%; object-fit:cover; object-position:top center; display:block; }
+  .panel-image::after{
+    content:''; position:absolute; inset:0;
+    background: linear-gradient(180deg, rgba(20,16,10,0) 55%, rgba(20,16,10,.35) 100%);
+    pointer-events:none;
+  }
+  .panel-image.hide{ display:none; }
+
+  .panel-seal{
+    width:56px; height:56px; border-radius:50%;
+    background: radial-gradient(circle at 34% 30%, #8C3A3A 0%, var(--wine) 55%, #4B1717 100%);
+    box-shadow: 0 0 0 3px rgba(184,134,59,.55), 0 4px 10px rgba(0,0,0,.4);
+    display:flex; align-items:center; justify-content:center;
+    color: var(--gold-bright);
+    font-family: var(--font-latin); font-size:1.4rem;
+    margin-bottom:1.1rem;
+  }
+
+  .panel .eyebrow{
+    font-family: var(--font-latin);
+    font-style:italic;
+    font-size:.92rem;
+    color: var(--wine);
+    letter-spacing:.03em;
+  }
+  .panel h2{
+    font-family: var(--font-kr);
+    font-size:1.7rem;
+    font-weight:700;
+    margin-top:.25rem;
+    letter-spacing:.03em;
+  }
+  .panel .ruler{
+    display:inline-block;
+    margin-top:.7rem;
+    font-family: var(--font-latin);
+    font-size:.78rem;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color: var(--verdigris);
+    border:1px solid var(--verdigris);
+    padding:.28em .8em;
+    border-radius:1px;
+  }
+  .panel .divider{
+    width:100%; height:1px;
+    margin:1.4rem 0 1.2rem;
+    background: linear-gradient(90deg, var(--gold) 0%, transparent 100%);
+  }
+  .panel p.desc{
+    font-size:1rem;
+    line-height:1.85;
+    letter-spacing:.01em;
+  }
+
+  .panel-close{
+    position:absolute; top:1.4rem; right:1.4rem;
+    width:34px; height:34px;
+    border-radius:50%;
+    border:1px solid rgba(36,29,20,.35);
+    background:transparent;
+    color: var(--ink);
+    font-size:1.1rem;
+    cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    transition: background .2s ease;
+  }
+  .panel-close:hover, .panel-close:focus-visible{
+    background: rgba(184,134,59,.18);
+    outline:none;
+  }
+
+  @media (max-width: 720px){
+    .panel{
+      top:auto; left:0; right:0; bottom:0; width:100%;
+      max-height:72vh;
+      border-radius:12px 12px 0 0;
+      transform: translateY(100%);
+      box-shadow: 0 -8px 40px rgba(0,0,0,.5);
+    }
+    .panel.open{ transform:translateY(0); }
+    .hotspot{ width:38px; height:38px; font-size:.95rem; }
+    .map-title{ top:3%; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <div class="map-frame" id="mapFrame">
+
+    <div class="map-bg"></div>
+
+    <div class="map-texture" id="noiseLayer"></div>
+    <div class="map-vignette"></div>
+
+    <div class="map-title">
+      <div class="eyebrow">TRIA · 트리아 제국</div>
+      <h1>알트하벤</h1>
+      <div class="sub">Althaven — "오래된 안식처"</div>
+    </div>
+
+    <svg class="compass" viewBox="0 0 100 100">
+      <g fill="none" stroke="#241D14" stroke-width="1.2">
+        <circle cx="50" cy="50" r="42"/>
+        <circle cx="50" cy="50" r="2" fill="#241D14"/>
+        <path d="M50,8 L56,46 L50,50 L44,46 Z" fill="#6E2A2A" stroke="none"/>
+        <path d="M50,92 L44,54 L50,50 L56,54 Z" fill="#241D14" stroke="none"/>
+        <path d="M8,50 L46,44 L50,50 L46,56 Z" fill="#B8863B" stroke="none" opacity=".8"/>
+        <path d="M92,50 L54,56 L50,50 L54,44 Z" fill="#B8863B" stroke="none" opacity=".8"/>
+      </g>
+    </svg>
+
+    <!-- ===== 핫스팟 좌표는 % 기준입니다. 실제 일러스트로 교체 후 --left/--top 값만 조정하세요. ===== -->
+    <div id="hotspots"></div>
+
+  </div>
+</div>
+
+<div class="panel-overlay" id="overlay"></div>
+<aside class="panel" id="panel" aria-live="polite">
+  <button class="panel-close" id="panelClose" aria-label="닫기">✕</button>
+  <div class="panel-image" id="panelImage"><img id="panelImg" src="" alt=""></div>
+  <div class="panel-seal" id="panelSeal"></div>
+  <div class="eyebrow" id="panelSub"></div>
+  <h2 id="panelTitle"></h2>
+  <span class="ruler" id="panelRuler"></span>
+  <div class="divider"></div>
+  <p class="desc" id="panelDesc"></p>
+</aside>
+
+<script>
+/* ============================================================
+   지역 데이터 — 좌표(top/left, % 기준)는 실제 일러스트에 맞춰 조정하세요.
+   ============================================================ */
+const districts = [
+  {
+    id: 'goldfeld',
+    seal: '⚜',
+    name: '골트펠트',
+    sub: 'Das Goldene Feld · 황금구',
+    ruler: '황실 · 골트가',
+    desc: '두카트가 강물처럼 흐르는 곳. 첨탑마다 황금이 씌워지고 궁정 마차의 바퀴 소리가 하루 종일 그치지 않는다. 재능 없이 부로 정점에 오른 황가의 위세가 가장 노골적으로 드러나는 구역이며, 동시에 그 위세 뒤에 숨은 여린 가족의 온기도 이 담장 안에 있다.',
+    top: 22, left: 52, img: '골트펠트.webp'
+  },
+  {
+    id: 'klanghohe',
+    seal: '♪',
+    name: '클랑회에',
+    sub: 'Klanghöhe · 선율의 언덕',
+    ruler: '4대 예술가문',
+    desc: '도시를 내려다보는 언덕 위, 네 가문의 저택이 첨탑처럼 늘어서 있다. 밤마다 살롱에서 흘러나오는 선율과 완성된 조각의 그림자가 골목을 채운다. 서로를 멸시하면서도 결코 떠나지 않는, 네 예술의 자존심이 부딪히는 곳.',
+    top: 16, left: 30, img: '클랑회에.webp'
+  },
+  {
+    id: 'malgasse',
+    seal: '✒',
+    name: '말가세',
+    sub: 'Malgasse · 팔레트 거리',
+    ruler: '무소속 · 평민 예술가',
+    desc: '물감 냄새와 목탄 가루가 뒤섞인 좁은 골목. 이름 없는 화가와 악사들이 벽에 걸어둔 습작들 사이로, 언젠가 아카데미의 문을 두드릴 꿈을 꾸는 이들이 하루를 살아낸다. 세습 없이, 오직 손끝의 재능만으로.',
+    top: 58, left: 24, img: '말가세.webp'
+  },
+  {
+    id: 'academy',
+    seal: '⚖',
+    name: '아카데미 광장',
+    sub: 'Akademieplatz',
+    ruler: '아카데미 (국립 자치)',
+    desc: '마법학당의 첨탑이 광장 한가운데 우뚝 서 있다. 귀족 자제의 마차와 평민 천재의 낡은 외투가 같은 돌바닥을 딛는, 제국에서 유일하게 핏줄이 힘을 못 쓰는 땅. 물밑에서는 다섯 세력의 그림자가 조용히 얽힌다.',
+    top: 48, left: 50, img: '아카데미_광장.webp'
+  },
+  {
+    id: 'aschengasse',
+    seal: '☾',
+    name: '아셴가세',
+    sub: 'Aschengasse · 잿빛 골목',
+    ruler: '없음 · 지배자 없는 야생',
+    desc: '해가 지면 지도에서 지워지는 거리. 경매의 속삭임과 위조된 걸작, 팔려 온 이들의 숨죽인 숨소리가 뒤섞인다. 이곳에 규칙이 있다면 단 하나 — 오늘 살아남는 자가 내일의 규칙을 정한다.',
+    top: 62, left: 72, img: '아셴가세.webp'
+  },
+  {
+    id: 'hafen',
+    seal: '⚓',
+    name: '하펜',
+    sub: 'Hafen · 부둣가',
+    ruler: '대항해선단',
+    desc: '소금기 밴 바람과 함께 낯선 향신료, 낯선 얼굴, 낯선 신의 이야기가 밀려드는 관문. 골트가의 부가 시작된 곳이자, 누군가에겐 사슬이 채워진 채 처음 발 디딘 땅.',
+    top: 82, left: 46, img: '하펜.webp'
+  }
+];
+
+const hotspotsEl = document.getElementById('hotspots');
+districts.forEach(d => {
+  const btn = document.createElement('button');
+  btn.className = 'hotspot';
+  btn.style.top = d.top + '%';
+  btn.style.left = d.left + '%';
+  btn.setAttribute('aria-label', d.name + ' 정보 보기');
+  btn.dataset.id = d.id;
+  btn.innerHTML = `<span class="pulse"></span>${d.seal}`;
+
+  const label = document.createElement('div');
+  label.className = 'hotspot-label';
+  label.style.top = d.top + '%';
+  label.style.left = d.left + '%';
+  label.textContent = d.name;
+
+  btn.addEventListener('click', () => openPanel(d, btn));
+  hotspotsEl.appendChild(btn);
+  hotspotsEl.appendChild(label);
+});
+
+const panel = document.getElementById('panel');
+const overlay = document.getElementById('overlay');
+let lastFocused = null;
+
+function openPanel(d, triggerEl){
+  document.querySelectorAll('.hotspot').forEach(h => h.classList.remove('active'));
+  triggerEl.classList.add('active');
+  lastFocused = triggerEl;
+
+  const imgWrap = document.getElementById('panelImage');
+  const img = document.getElementById('panelImg');
+  if(d.img){
+    imgWrap.classList.remove('hide');
+    img.onerror = () => imgWrap.classList.add('hide');
+    img.src = d.img;
+    img.alt = d.name;
+  } else {
+    imgWrap.classList.add('hide');
+  }
+
+  document.getElementById('panelSeal').textContent = d.seal;
+  document.getElementById('panelSub').textContent = d.sub;
+  document.getElementById('panelTitle').textContent = d.name;
+  document.getElementById('panelRuler').textContent = d.ruler;
+  document.getElementById('panelDesc').textContent = d.desc;
+
+  panel.classList.add('open');
+  overlay.classList.add('open');
+  document.getElementById('panelClose').focus();
+}
+
+function closePanel(){
+  panel.classList.remove('open');
+  overlay.classList.remove('open');
+  document.querySelectorAll('.hotspot').forEach(h => h.classList.remove('active'));
+  if(lastFocused) lastFocused.focus();
+}
+
+document.getElementById('panelClose').addEventListener('click', closePanel);
+overlay.addEventListener('click', closePanel);
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape' && panel.classList.contains('open')) closePanel();
+});
+
+/* 양피지 노이즈 텍스처 (SVG feTurbulence, 순수 CSS 대체 불가 요소만 캔버스 없이 처리) */
+(function(){
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(svgNS, 'svg');
+  svg.setAttribute('width','100%');
+  svg.setAttribute('height','100%');
+  svg.innerHTML = `
+    <filter id="grain"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
+    <rect width="100%" height="100%" filter="url(#grain)" opacity="0.06"/>`;
+  document.getElementById('noiseLayer').appendChild(svg);
+})();
+</script>
+</body>
+</html>
