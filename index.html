@@ -2,19 +2,6 @@
 <html lang="ko"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tria Empire — 트리아 제국</title>
-<!-- ══════════════════════════════════════════════════════════
-     깃허브 업로드 파일 규칙 (전부 WebP, 폴더 없이 저장소 루트에 평평하게)
-     · 히어로(PC 가로)  : Hero_3.webp   (1216×832)
-     · 히어로(모바일 세로): Hero_2.webp   (832×1216)
-     · 웹툰            : 1.webp ~ 5.webp
-     · 캐릭터          : {이름}_{감정}.webp
-       감정 7종: 대화 / 기쁨 / 부끄러움 / 슬픔 / 불안 / 아픔 / 분노
-       예) 아르테_대화.webp , 테오도라_분노.webp
-     · 지역 컷(지도 패널) : 골트펠트.webp / 클랑회에.webp / 말가세.webp /
-       아카데미_광장.webp / 아셴가세.webp / 하펜.webp
-     · BGM             : bgm.mp3
-     ※ 지도는 index.html에 내장 — althaven_map.html, 알트하벤_배경.webp 는 더 이상 사용하지 않음
-   ══════════════════════════════════════════════════════════ -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Nanum+Myeongjo:wght@400;700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
@@ -66,7 +53,7 @@ section{max-width:1080px;margin:0 auto;padding:90px 22px}
 @media (prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none}.divide{width:120px}}
 /* ── 히어로: 여백 없이 화면 꽉 채움 ── */
 .hero{position:relative;width:100%;height:100vh;height:100svh;min-height:480px;overflow:hidden}
-.hero picture,.hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center}
+.hero picture,.hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;opacity:0.4;}
 .hero::after{content:"";position:absolute;inset:0;
  background:linear-gradient(180deg,rgba(9,13,24,.25) 0%,transparent 30%,transparent 55%,rgba(9,13,24,.88) 100%)}
 .hero-txt{position:absolute;left:0;right:0;bottom:0;z-index:2;text-align:center;padding:0 22px 58px}
@@ -305,25 +292,20 @@ footer .cr{margin-top:36px;font-size:11px;color:#4b566e;letter-spacing:.1em}
       </pattern>
      </defs>
      <rect width="1000" height="1000" fill="url(#mGrid)"/>
-     <!-- 바다 -->
      <path d="M0,805 C160,782 330,824 500,802 C670,780 840,822 1000,798 L1000,1000 L0,1000 Z" fill="url(#mSea)"/>
      <path d="M120,868 C220,856 320,876 420,864" stroke="rgba(180,210,235,.25)" stroke-width="2" fill="none" stroke-linecap="round"/>
      <path d="M600,905 C700,893 800,913 900,901" stroke="rgba(180,210,235,.2)" stroke-width="2" fill="none" stroke-linecap="round"/>
      <path d="M712,846 l20,-30 l6,30 Z" fill="rgba(216,201,160,.5)"/>
-     <!-- 강 (북 → 남 바다) -->
      <path d="M600,0 C585,90 545,150 560,220 C575,290 515,350 500,430 C485,510 512,570 492,650 C478,708 498,748 486,806" stroke="#2c5a92" stroke-width="30" fill="none" stroke-linecap="round" opacity=".9"/>
      <path d="M600,0 C585,90 545,150 560,220 C575,290 515,350 500,430 C485,510 512,570 492,650 C478,708 498,748 486,806" stroke="#5d90c6" stroke-width="8" fill="none" stroke-linecap="round" opacity=".45"/>
-     <!-- 구역 블롭 -->
      <path d="M180,140 C260,88 360,108 402,178 C432,238 382,312 300,332 C218,352 148,302 140,230 C136,184 150,160 180,140 Z" fill="rgba(122,110,213,.24)" stroke="rgba(143,132,232,.75)" stroke-width="1.6" stroke-dasharray="7 9"/>
      <path d="M600,110 C700,72 810,104 848,186 C878,254 826,330 726,352 C640,370 588,322 572,252 C560,198 566,140 600,110 Z" fill="rgba(216,201,160,.18)" stroke="rgba(216,201,160,.7)" stroke-width="1.6" stroke-dasharray="7 9"/>
      <path d="M350,420 C420,368 542,378 582,450 C614,510 562,582 470,596 C388,610 328,560 318,500 C312,464 324,440 350,420 Z" fill="rgba(96,138,224,.22)" stroke="rgba(130,168,240,.7)" stroke-width="1.6" stroke-dasharray="7 9"/>
      <path d="M140,568 C212,528 302,544 332,610 C356,666 316,730 240,746 C168,760 108,716 104,654 C102,618 116,592 140,568 Z" fill="rgba(80,170,150,.2)" stroke="rgba(110,196,176,.65)" stroke-width="1.6" stroke-dasharray="7 9"/>
      <path d="M688,478 C760,438 872,458 902,530 C926,590 886,662 800,676 C720,690 658,646 654,580 C652,540 660,508 688,478 Z" fill="rgba(122,130,144,.2)" stroke="rgba(150,158,172,.6)" stroke-width="1.6" stroke-dasharray="7 9"/>
      <path d="M378,700 C450,668 562,674 612,720 C652,758 632,822 560,846 C478,872 388,856 354,800 C334,764 350,726 378,700 Z" fill="rgba(74,142,192,.22)" stroke="rgba(110,170,215,.65)" stroke-width="1.6" stroke-dasharray="7 9"/>
-     <!-- 다리 -->
      <path d="M508,252 L624,244" stroke="#b9a878" stroke-width="6" stroke-linecap="round"/>
      <path d="M436,602 L556,594" stroke="#b9a878" stroke-width="6" stroke-linecap="round"/>
-     <!-- 장식: 언덕(클랑회에)·왕관(골트펠트)·첨탑(아카데미)·부두(하펜) -->
      <path d="M240,206 l26,-38 26,38 Z" fill="none" stroke="rgba(143,132,232,.8)" stroke-width="2"/>
      <path d="M300,214 l20,-30 20,30 Z" fill="none" stroke="rgba(143,132,232,.65)" stroke-width="2"/>
      <path d="M672,222 v-24 l10,12 10,-20 10,20 10,-12 v24 Z" fill="none" stroke="rgba(216,201,160,.85)" stroke-width="2"/>
@@ -425,7 +407,7 @@ factions:[
 {disp:"기사",sub:"명예의 갑주",body:"명예를 갑주처럼 두른 제국의 검. 허나 화려한 문장 아래에는 실전에서 밀리고 있다는 불안이 자란다. 이상과 현실 사이에서, 기사도는 시험받고 있다.",chars:[
 {name:"아델하이트",meta:"1476년생 · 女 · 169cm · 57kg",look:"화려한 기사 갑주 · 귀족 문장",pers:"자부심, 격식",line:"명예의 화신인 기사단장. 실전에서 밀린다는 불안을 갑주 안에 감춘다."},
 {name:"클라우디아",meta:"1481년생 · 女 · 165cm · 52kg",look:"정갈한 기사복 · 앳된 얼굴",pers:"정중하나 미숙",line:"미완의 젊은 기사. 그 곧음이 이상인지 오만인지는 아직 모른다."}]},
-{disp:"유랑",sub:"길 위의 무대",body:"등급도 신분도 없는 자들이 모인 길 위의 극단. 제국의 눈이 닿지 않는 변두리를 떠돌며 무대를 세운다. 그리고 이 극단은 &mdash; 세계에서 가장 큰 비밀 하나를 품고 있다.",chars:[
+{disp:"유랑",sub:"길 위의 무대",body:"등급도 신분도 없는 자들이 모인 길 위의 극단. 제국의 눈이 닿지 않는 변두리를 떠돌며 무대를 세운다. 그리고 이 극단은 &mdash; 세계에서 가장 큰 비밀 하나를 품고 제국을 유랑한다.",chars:[
 {name:"베라",meta:"1475년생 · 女 · 166cm · 51kg",look:"화려하나 낡은 무대 의상 · 풍파를 아는 눈",pers:"능란, 유들유들",line:"자유와 고단함을 함께 짊어진 극단장. 위계를 등진 과거가 있다."},
 {name:"비앙카",meta:"1482년생 · 女 · 162cm · 48kg",look:"눈부신 무대 의상과 화장",pers:"무대에선 화려, 무대 뒤에선 조용",line:"무대 위에선 가장 빛나고, 무대 뒤에선 가장 외로운 간판 배우."},
 {name:"엘라",meta:"출생 미상(외견 19세) · 女 · 161cm · 49kg",look:"창백한 미모 · 붉은 눈 · 이국적 무대 의상으로 정체를 위장",pers:"조용, 경계",line:"시들지 않는 이질적인 아름다움. 그 정체를 무대 의상 아래 감춘, 쫓기는 도피자."},
@@ -642,3 +624,4 @@ btn.onclick=()=>{if(audio.paused){audio.play().then(()=>{btn.textContent='♪';b
  else{audio.pause();btn.textContent='♫';btn.classList.remove('playing');}};
 </script>
 </body></html>
+
