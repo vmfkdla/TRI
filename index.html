@@ -10,7 +10,10 @@
      · 캐릭터          : {이름}_{감정}.webp
        감정 7종: 대화 / 기쁨 / 부끄러움 / 슬픔 / 불안 / 아픔 / 분노
        예) 아르테_대화.webp , 테오도라_분노.webp
+     · 지역 컷(지도 패널) : 골트펠트.webp / 클랑회에.webp / 말가세.webp /
+       아카데미_광장.webp / 아셴가세.webp / 하펜.webp
      · BGM             : bgm.mp3
+     ※ 지도는 index.html에 내장 — althaven_map.html, 알트하벤_배경.webp 는 더 이상 사용하지 않음
    ══════════════════════════════════════════════════════════ -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -162,12 +165,62 @@ section{max-width:1080px;margin:0 auto;padding:90px 22px}
 .locked.breaking h3,.locked.breaking p,.locked.breaking .hint,.locked.breaking .lockbadge{
  animation:fadeaway .5s ease forwards}
 @keyframes fadeaway{to{opacity:0;transform:translateY(-10px)}}
-/* 지도 프레임 */
-.map-shell{border:1px solid var(--line-c);border-radius:16px;overflow:hidden;background:#14100a;
- box-shadow:0 24px 60px rgba(0,0,0,.5);opacity:0;transform:translateY(24px);
- transition:opacity .7s ease,transform .7s ease;height:0;pointer-events:none}
-.map-shell.reveal{opacity:1;transform:none;height:auto;pointer-events:auto}
-.map-shell iframe{display:block;width:100%;height:min(78vh,760px);border:0}
+/* 지도 (인라인 SVG · 드래그/줌) */
+.map-shell{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease;height:0;overflow:hidden;pointer-events:none}
+.map-shell.reveal{opacity:1;transform:none;height:auto;overflow:visible;pointer-events:auto}
+.map-titlebar{text-align:center;margin-bottom:16px}
+.map-titlebar .map-eyebrow{font-family:'Nanum Myeongjo',serif;font-size:12px;letter-spacing:.25em;color:var(--champ);opacity:.85}
+.map-titlebar h3{font-family:'Nanum Myeongjo',serif;font-size:1.7rem;color:var(--pearl-hi);margin-top:4px}
+.map-stage{position:relative;width:100%;max-width:760px;margin:0 auto;aspect-ratio:1/1;overflow:hidden;
+ border:1px solid var(--line-c);border-radius:16px;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;
+ background:radial-gradient(1px 1px at 22% 18%,rgba(238,243,250,.55),transparent),
+  radial-gradient(1px 1px at 68% 32%,rgba(238,243,250,.4),transparent),
+  radial-gradient(1.5px 1.5px at 42% 8%,rgba(216,201,160,.5),transparent),
+  radial-gradient(1px 1px at 85% 14%,rgba(238,243,250,.45),transparent),
+  radial-gradient(ellipse at 50% 0%,#182a4a 0%,#101a30 45%,#0b1322 100%);
+ box-shadow:0 24px 60px rgba(0,0,0,.5)}
+.map-stage:active{cursor:grabbing}
+.map-world{position:absolute;inset:0;transform-origin:0 0;will-change:transform}
+.map-world>svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.pin{position:absolute;width:46px;height:46px;transform:translate(-50%,-50%);padding:0;border:none;background:transparent;cursor:pointer;z-index:3}
+.pin svg{width:100%;height:100%;display:block;filter:drop-shadow(0 4px 10px rgba(0,0,0,.55));transition:transform .2s ease}
+.pin:hover svg,.pin:focus-visible svg{transform:scale(1.15)}
+.pin span{position:absolute;top:calc(100% - 5px);left:50%;transform:translateX(-50%);
+ font-family:'Nanum Myeongjo',serif;font-size:11px;font-weight:700;color:var(--champ);white-space:nowrap;
+ text-shadow:0 1px 4px rgba(0,0,0,.9),0 0 10px rgba(0,0,0,.6);pointer-events:none}
+.map-ctrl{position:absolute;top:12px;right:12px;display:flex;flex-direction:column;gap:6px;z-index:5}
+.map-ctrl button{width:36px;height:36px;border-radius:9px;border:1px solid var(--line-c);cursor:pointer;
+ background:rgba(13,18,32,.85);color:var(--champ);font-size:17px;line-height:1;backdrop-filter:blur(4px);transition:.2s}
+.map-ctrl button:hover{color:var(--pearl-hi);border-color:var(--champ)}
+.map-hint{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);z-index:5;
+ font-size:12px;letter-spacing:.08em;color:var(--pearl);background:rgba(13,18,32,.75);
+ border:1px solid var(--line);border-radius:999px;padding:7px 16px;pointer-events:none;
+ transition:opacity .6s ease;white-space:nowrap}
+.map-hint.hide{opacity:0}
+/* 구역 정보 패널 */
+.mp-overlay{position:fixed;inset:0;z-index:94;background:rgba(6,9,18,.6);backdrop-filter:blur(4px);
+ opacity:0;pointer-events:none;transition:opacity .3s ease}
+.mp-overlay.open{opacity:1;pointer-events:auto}
+.mp-panel{position:fixed;top:0;right:0;bottom:0;z-index:95;width:min(400px,92vw);overflow-y:auto;
+ background:linear-gradient(160deg,var(--panel),var(--bg2));border-left:1px solid var(--line-c);
+ box-shadow:-14px 0 44px rgba(0,0,0,.55);padding:26px 24px;transform:translateX(105%);
+ transition:transform .4s cubic-bezier(.16,.84,.44,1)}
+.mp-panel.open{transform:none}
+.mp-close{position:absolute;top:14px;right:16px;width:34px;height:34px;border-radius:50%;cursor:pointer;
+ border:1px solid var(--line);background:rgba(9,13,24,.6);color:var(--pearl);font-size:19px;line-height:1;z-index:2}
+.mp-img{border-radius:12px;overflow:hidden;border:1px solid var(--line-c);margin-bottom:18px;
+ max-height:44vh;background:var(--panel2)}
+.mp-img img{width:100%;max-height:44vh;object-fit:cover;object-position:top center;display:block}
+.mp-img.hide{display:none}
+.mp-sub{font-family:'Nanum Myeongjo',serif;font-size:12px;letter-spacing:.12em;color:var(--champ)}
+.mp-panel h3{font-family:'Nanum Myeongjo',serif;font-size:1.7rem;color:var(--pearl-hi);margin:4px 0 12px}
+.mp-ruler{display:inline-block;font-size:12px;color:#0d1220;font-weight:700;letter-spacing:.05em;
+ background:linear-gradient(135deg,var(--pearl-hi),var(--champ));border-radius:999px;padding:5px 14px}
+.mp-desc{margin-top:16px;font-size:.94rem;color:#c3cede;line-height:1.9}
+@media(max-width:640px){.mp-panel{top:auto;left:0;right:0;bottom:0;width:100%;max-height:76vh;
+ border-left:none;border-top:1px solid var(--line-c);border-radius:16px 16px 0 0;transform:translateY(105%)}
+ .mp-panel.open{transform:none}
+ .pin{width:40px;height:40px}}
 .map-reseal{text-align:center;margin-top:14px}
 .map-reseal button{font-family:'Nanum Myeongjo',serif;font-size:.82rem;color:var(--slate);cursor:pointer;
  background:transparent;border:1px solid var(--line);border-radius:999px;padding:7px 18px;transition:.25s}
@@ -239,7 +292,53 @@ footer .cr{margin-top:36px;font-size:11px;color:#4b566e;letter-spacing:.1em}
   <div class="hint">&#9670;&ensp;봉인 풀기&ensp;&#9670;</div>
  </div>
  <div class="map-shell" id="mapShell">
-  <iframe id="mapFrame" title="알트하벤 지도" loading="lazy" data-src="althaven_map.html"></iframe>
+  <div class="map-titlebar"><div class="map-eyebrow">ALTHAVEN — "오래된 안식처"</div><h3>알트하벤</h3></div>
+  <div class="map-stage" id="mapStage">
+   <div class="map-world" id="mapWorld">
+    <svg viewBox="0 0 1000 1000" aria-hidden="true">
+     <defs>
+      <linearGradient id="mSea" x1="0" y1="0" x2="0" y2="1">
+       <stop offset="0" stop-color="#16324f"/><stop offset="1" stop-color="#0d2036"/>
+      </linearGradient>
+      <pattern id="mGrid" width="62" height="62" patternUnits="userSpaceOnUse">
+       <path d="M62,0 H0 V62" fill="none" stroke="rgba(208,218,232,.05)" stroke-width="1"/>
+      </pattern>
+     </defs>
+     <rect width="1000" height="1000" fill="url(#mGrid)"/>
+     <!-- 바다 -->
+     <path d="M0,805 C160,782 330,824 500,802 C670,780 840,822 1000,798 L1000,1000 L0,1000 Z" fill="url(#mSea)"/>
+     <path d="M120,868 C220,856 320,876 420,864" stroke="rgba(180,210,235,.25)" stroke-width="2" fill="none" stroke-linecap="round"/>
+     <path d="M600,905 C700,893 800,913 900,901" stroke="rgba(180,210,235,.2)" stroke-width="2" fill="none" stroke-linecap="round"/>
+     <path d="M712,846 l20,-30 l6,30 Z" fill="rgba(216,201,160,.5)"/>
+     <!-- 강 (북 → 남 바다) -->
+     <path d="M600,0 C585,90 545,150 560,220 C575,290 515,350 500,430 C485,510 512,570 492,650 C478,708 498,748 486,806" stroke="#2c5a92" stroke-width="30" fill="none" stroke-linecap="round" opacity=".9"/>
+     <path d="M600,0 C585,90 545,150 560,220 C575,290 515,350 500,430 C485,510 512,570 492,650 C478,708 498,748 486,806" stroke="#5d90c6" stroke-width="8" fill="none" stroke-linecap="round" opacity=".45"/>
+     <!-- 구역 블롭 -->
+     <path d="M180,140 C260,88 360,108 402,178 C432,238 382,312 300,332 C218,352 148,302 140,230 C136,184 150,160 180,140 Z" fill="rgba(122,110,213,.24)" stroke="rgba(143,132,232,.75)" stroke-width="1.6" stroke-dasharray="7 9"/>
+     <path d="M600,110 C700,72 810,104 848,186 C878,254 826,330 726,352 C640,370 588,322 572,252 C560,198 566,140 600,110 Z" fill="rgba(216,201,160,.18)" stroke="rgba(216,201,160,.7)" stroke-width="1.6" stroke-dasharray="7 9"/>
+     <path d="M350,420 C420,368 542,378 582,450 C614,510 562,582 470,596 C388,610 328,560 318,500 C312,464 324,440 350,420 Z" fill="rgba(96,138,224,.22)" stroke="rgba(130,168,240,.7)" stroke-width="1.6" stroke-dasharray="7 9"/>
+     <path d="M140,568 C212,528 302,544 332,610 C356,666 316,730 240,746 C168,760 108,716 104,654 C102,618 116,592 140,568 Z" fill="rgba(80,170,150,.2)" stroke="rgba(110,196,176,.65)" stroke-width="1.6" stroke-dasharray="7 9"/>
+     <path d="M688,478 C760,438 872,458 902,530 C926,590 886,662 800,676 C720,690 658,646 654,580 C652,540 660,508 688,478 Z" fill="rgba(122,130,144,.2)" stroke="rgba(150,158,172,.6)" stroke-width="1.6" stroke-dasharray="7 9"/>
+     <path d="M378,700 C450,668 562,674 612,720 C652,758 632,822 560,846 C478,872 388,856 354,800 C334,764 350,726 378,700 Z" fill="rgba(74,142,192,.22)" stroke="rgba(110,170,215,.65)" stroke-width="1.6" stroke-dasharray="7 9"/>
+     <!-- 다리 -->
+     <path d="M508,252 L624,244" stroke="#b9a878" stroke-width="6" stroke-linecap="round"/>
+     <path d="M436,602 L556,594" stroke="#b9a878" stroke-width="6" stroke-linecap="round"/>
+     <!-- 장식: 언덕(클랑회에)·왕관(골트펠트)·첨탑(아카데미)·부두(하펜) -->
+     <path d="M240,206 l26,-38 26,38 Z" fill="none" stroke="rgba(143,132,232,.8)" stroke-width="2"/>
+     <path d="M300,214 l20,-30 20,30 Z" fill="none" stroke="rgba(143,132,232,.65)" stroke-width="2"/>
+     <path d="M672,222 v-24 l10,12 10,-20 10,20 10,-12 v24 Z" fill="none" stroke="rgba(216,201,160,.85)" stroke-width="2"/>
+     <path d="M450,492 L466,448 L482,492 Z" fill="none" stroke="rgba(130,168,240,.85)" stroke-width="2"/>
+     <path d="M430,842 V892 M480,850 V900 M530,846 V896" stroke="rgba(216,201,160,.5)" stroke-width="5" stroke-linecap="round"/>
+    </svg>
+    <div id="pinLayer"></div>
+   </div>
+   <div class="map-ctrl">
+    <button type="button" id="mzIn" aria-label="확대">+</button>
+    <button type="button" id="mzOut" aria-label="축소">&minus;</button>
+    <button type="button" id="mzReset" aria-label="원래대로">&#8634;</button>
+   </div>
+   <div class="map-hint" id="mapHint">드래그 · 휠/핀치로 지도를 탐험해 보세요</div>
+  </div>
  </div>
  <div class="map-reseal" id="mapReseal" style="display:none"><button type="button">&#9939; 다시 봉인하기</button></div>
 </section>
@@ -247,6 +346,16 @@ footer .cr{margin-top:36px;font-size:11px;color:#4b566e;letter-spacing:.1em}
 <footer><div class="fl">Tria Empire</div>
  <div class="fq">이야기는 여기서, 당신의 손으로 이어집니다.</div>
  <div class="cr">TRIA EMPIRE &middot; A WORLD WHERE MAGIC IS ART</div></footer>
+
+<div class="mp-overlay" id="mpOverlay"></div>
+<aside class="mp-panel" id="mpPanel" aria-live="polite">
+ <button class="mp-close" id="mpClose" aria-label="닫기">&times;</button>
+ <div class="mp-img" id="mpImgWrap"><img id="mpImg" alt=""></div>
+ <div class="mp-sub" id="mpSub"></div>
+ <h3 id="mpName"></h3>
+ <span class="mp-ruler" id="mpRuler"></span>
+ <p class="mp-desc" id="mpDesc"></p>
+</aside>
 
 <div class="lb" id="lb"><div class="lbbox">
  <button class="lbclose">&times;</button>
@@ -402,17 +511,116 @@ const links=[...document.querySelectorAll('.pill a')];
 const secs=links.map(a=>document.querySelector(a.getAttribute('href')));
 window.addEventListener('scroll',()=>{let cur=0;secs.forEach((s,i)=>{if(s&&s.getBoundingClientRect().top<160)cur=i;});
  links.forEach((a,i)=>a.classList.toggle('on',i===cur));});
+// imperial map (inline SVG · pan/zoom)
+(function(){
+ const D=[
+  {x:28,y:23,name:'클랑회에',sub:'Klanghöhe · 선율의 언덕',ruler:'4대 예술가문',img:'클랑회에.webp',
+   desc:'도시를 내려다보는 언덕 위, 네 가문의 저택이 첨탑처럼 늘어서 있다. 밤마다 살롱에서 흘러나오는 선율과 완성된 조각의 그림자가 골목을 채운다. 서로를 멸시하면서도 결코 떠나지 않는, 네 예술의 자존심이 부딪히는 곳.'},
+  {x:70,y:23,name:'골트펠트',sub:'Das Goldene Feld · 황금구',ruler:'황실 · 골트가',img:'골트펠트.webp',
+   desc:'두카트가 강물처럼 흐르는 곳. 첨탑마다 황금이 씌워지고 궁정 마차의 바퀴 소리가 하루 종일 그치지 않는다. 재능 없이 부로 정점에 오른 황가의 위세가 가장 노골적으로 드러나는 구역이며, 동시에 그 위세 뒤에 숨은 여린 가족의 온기도 이 담장 안에 있다.'},
+  {x:45,y:50,name:'아카데미 광장',sub:'Akademieplatz',ruler:'아카데미 (국립 자치)',img:'아카데미_광장.webp',
+   desc:'마법학당의 첨탑이 광장 한가운데 우뚝 서 있다. 귀족 자제의 마차와 평민 천재의 낡은 외투가 같은 돌바닥을 딛는, 제국에서 유일하게 핏줄이 힘을 못 쓰는 땅. 물밑에서는 다섯 세력의 그림자가 조용히 얽힌다.'},
+  {x:22,y:65,name:'말가세',sub:'Malgasse · 팔레트 거리',ruler:'무소속 · 평민 예술가',img:'말가세.webp',
+   desc:'물감 냄새와 목탄 가루가 뒤섞인 좁은 골목. 이름 없는 화가와 악사들이 벽에 걸어둔 습작들 사이로, 언젠가 아카데미의 문을 두드릴 꿈을 꾸는 이들이 하루를 살아낸다. 세습 없이, 오직 손끝의 재능만으로.'},
+  {x:78,y:57,name:'아셴가세',sub:'Aschengasse · 잿빛 골목',ruler:'없음 · 지배자 없는 야생',img:'아셴가세.webp',
+   desc:'해가 지면 지도에서 지워지는 거리. 경매의 속삭임과 위조된 걸작, 팔려 온 이들의 숨죽인 숨소리가 뒤섞인다. 이곳에 규칙이 있다면 단 하나 — 오늘 살아남는 자가 내일의 규칙을 정한다.'},
+  {x:48,y:77,name:'하펜',sub:'Hafen · 부둣가',ruler:'대항해선단',img:'하펜.webp',
+   desc:'소금기 밴 바람과 함께 낯선 향신료, 낯선 얼굴, 낯선 신의 이야기가 밀려드는 관문. 골트가의 부가 시작된 곳이자, 누군가에겐 사슬이 채워진 채 처음 발 디딘 땅.'}
+ ];
+ const stage=document.getElementById('mapStage'),world=document.getElementById('mapWorld'),
+  layer=document.getElementById('pinLayer'),hint=document.getElementById('mapHint');
+ let S={x:0,y:0,s:1},moved=0;
+ function apply(){
+  const W=stage.clientWidth,H=stage.clientHeight;
+  S.s=Math.min(3,Math.max(1,S.s));
+  S.x=Math.min(0,Math.max(W-W*S.s,S.x));
+  S.y=Math.min(0,Math.max(H-H*S.s,S.y));
+  world.style.transform=`translate(${S.x}px,${S.y}px) scale(${S.s})`;
+ }
+ // 핀
+ const PIN='<svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="16.5" fill="#1b2440" stroke="#d8c9a0" stroke-width="2.4"/><path d="M20,11 C25.5,11 29,15.2 29,20 C29,26 20,32.5 20,32.5 C20,32.5 11,26 11,20 C11,15.2 14.5,11 20,11 Z" fill="#e9c46a"/></svg>';
+ D.forEach(d=>{
+  const b=document.createElement('button');b.className='pin';b.type='button';
+  b.style.left=d.x+'%';b.style.top=d.y+'%';
+  b.setAttribute('aria-label',d.name+' 정보 보기');
+  b.innerHTML=PIN+`<span>${d.name}</span>`;
+  b.addEventListener('click',()=>{if(moved>8)return;openMp(d);});
+  layer.appendChild(b);
+ });
+ // 패널
+ const ov=document.getElementById('mpOverlay'),pn=document.getElementById('mpPanel');
+ function openMp(d){
+  const iw=document.getElementById('mpImgWrap'),im=document.getElementById('mpImg');
+  iw.classList.remove('hide');im.onerror=()=>iw.classList.add('hide');
+  im.src=d.img;im.alt=d.name;
+  document.getElementById('mpSub').textContent=d.sub;
+  document.getElementById('mpName').textContent=d.name;
+  document.getElementById('mpRuler').textContent=d.ruler;
+  document.getElementById('mpDesc').textContent=d.desc;
+  ov.classList.add('open');pn.classList.add('open');
+ }
+ function closeMp(){ov.classList.remove('open');pn.classList.remove('open');}
+ ov.addEventListener('click',closeMp);
+ document.getElementById('mpClose').addEventListener('click',closeMp);
+ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMp();});
+ // 드래그 & 줌
+ const pts=new Map();let start=null;
+ stage.addEventListener('pointerdown',e=>{
+  pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  moved=0;hint.classList.add('hide');
+  if(pts.size===1)start={S:{...S},px:e.clientX,py:e.clientY};
+  else if(pts.size===2){const[a,b]=[...pts.values()];
+   start={S:{...S},dist:Math.hypot(a.x-b.x,a.y-b.y)};}
+ });
+ window.addEventListener('pointermove',e=>{
+  if(!pts.has(e.pointerId))return;
+  pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(pts.size===1&&start){
+   const dx=e.clientX-start.px,dy=e.clientY-start.py;
+   moved=Math.max(moved,Math.hypot(dx,dy));
+   S.x=start.S.x+dx;S.y=start.S.y+dy;apply();
+  }else if(pts.size===2&&start&&start.dist){
+   const[a,b]=[...pts.values()];
+   const dist=Math.hypot(a.x-b.x,a.y-b.y);
+   const mx=(a.x+b.x)/2,my=(a.y+b.y)/2;
+   const r=stage.getBoundingClientRect(),cx=mx-r.left,cy=my-r.top;
+   const ns=Math.min(3,Math.max(1,start.S.s*dist/start.dist));
+   S.x=cx-(cx-start.S.x)*(ns/start.S.s);
+   S.y=cy-(cy-start.S.y)*(ns/start.S.s);
+   S.s=ns;moved=99;apply();
+  }
+ });
+ function up(e){
+  pts.delete(e.pointerId);
+  if(pts.size===0)start=null;
+  else if(pts.size===1){const p=[...pts.values()][0];start={S:{...S},px:p.x,py:p.y};}
+ }
+ window.addEventListener('pointerup',up);window.addEventListener('pointercancel',up);
+ function zoomAt(cx,cy,f){
+  const ns=Math.min(3,Math.max(1,S.s*f));
+  S.x=cx-(cx-S.x)*(ns/S.s);S.y=cy-(cy-S.y)*(ns/S.s);S.s=ns;apply();
+ }
+ stage.addEventListener('wheel',e=>{
+  e.preventDefault();
+  const r=stage.getBoundingClientRect();
+  zoomAt(e.clientX-r.left,e.clientY-r.top,e.deltaY<0?1.18:1/1.18);
+  hint.classList.add('hide');
+ },{passive:false});
+ document.getElementById('mzIn').addEventListener('click',()=>zoomAt(stage.clientWidth/2,stage.clientHeight/2,1.3));
+ document.getElementById('mzOut').addEventListener('click',()=>zoomAt(stage.clientWidth/2,stage.clientHeight/2,1/1.3));
+ document.getElementById('mzReset').addEventListener('click',()=>{S={x:0,y:0,s:1};apply();});
+ window.addEventListener('resize',apply);
+ apply();
+})();
 // map seal
 (function(){
- const lock=document.getElementById('mapLock'),shell=document.getElementById('mapShell'),
-  frame=document.getElementById('mapFrame'),reseal=document.getElementById('mapReseal');
+ const lock=document.getElementById('mapLock'),shell=document.getElementById('mapShell'),reseal=document.getElementById('mapReseal');
  let opened=false;
  function open(){
   if(opened)return;opened=true;
   lock.classList.add('breaking');
   setTimeout(()=>{
    lock.style.display='none';
-   if(!frame.src)frame.src=frame.dataset.src;
    shell.classList.add('reveal');
    reseal.style.display='block';
    shell.scrollIntoView({behavior:'smooth',block:'center'});
