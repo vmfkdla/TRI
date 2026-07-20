@@ -141,15 +141,37 @@ section{max-width:1080px;margin:0 auto;padding:90px 22px}
  border-radius:14px;overflow:hidden}
 .webtoon-wrap img{width:100%;display:block}
 /* ── 봉인 ── */
-.locked{position:relative;border:1px solid var(--line);border-radius:16px;overflow:hidden;min-height:300px;
+.locked{position:relative;border:1px solid var(--line);border-radius:16px;overflow:hidden;min-height:340px;cursor:pointer;
  display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px 30px;
  background:repeating-linear-gradient(135deg,rgba(0,0,0,.25),rgba(0,0,0,.25) 22px,transparent 22px,transparent 46px),
- linear-gradient(160deg,var(--panel),var(--bg2))}
-.chain{font-size:2.6rem;letter-spacing:.3em;color:var(--champ-d);opacity:.7;margin-bottom:18px}
+ linear-gradient(160deg,var(--panel),var(--bg2));transition:box-shadow .4s ease,border-color .4s ease}
+.locked:hover{border-color:var(--line-c);box-shadow:0 0 34px rgba(216,201,160,.12)}
+.locked .hint{margin-top:22px;font-size:12px;letter-spacing:.2em;color:var(--champ);opacity:.85;
+ border:1px solid var(--line-c);border-radius:999px;padding:8px 20px;transition:.3s}
+.locked:hover .hint{background:rgba(216,201,160,.1);color:var(--pearl-hi)}
+.chain{font-size:2.6rem;letter-spacing:.3em;color:var(--champ-d);opacity:.7;margin-bottom:18px;transition:.5s}
+.locked:hover .chain{letter-spacing:.42em;color:var(--champ)}
 .locked h3{font-family:'Nanum Myeongjo',serif;font-size:1.5rem;color:var(--pearl);margin-bottom:10px}
 .locked p{color:var(--slate);font-size:.92rem;max-width:420px}
 .lockbadge{position:absolute;top:16px;right:18px;font-size:12px;color:var(--champ);border:1px solid var(--line-c);
  border-radius:999px;padding:4px 12px;letter-spacing:.1em}
+/* 봉인 해제 애니메이션 */
+.locked.breaking .chain{animation:chainbreak .7s ease forwards}
+@keyframes chainbreak{0%{transform:scale(1);opacity:.7}40%{transform:scale(1.25);opacity:1}
+ 100%{transform:scale(.4) translateY(30px);opacity:0;filter:blur(4px)}}
+.locked.breaking h3,.locked.breaking p,.locked.breaking .hint,.locked.breaking .lockbadge{
+ animation:fadeaway .5s ease forwards}
+@keyframes fadeaway{to{opacity:0;transform:translateY(-10px)}}
+/* 지도 프레임 */
+.map-shell{border:1px solid var(--line-c);border-radius:16px;overflow:hidden;background:#14100a;
+ box-shadow:0 24px 60px rgba(0,0,0,.5);opacity:0;transform:translateY(24px);
+ transition:opacity .7s ease,transform .7s ease;height:0;pointer-events:none}
+.map-shell.reveal{opacity:1;transform:none;height:auto;pointer-events:auto}
+.map-shell iframe{display:block;width:100%;height:min(78vh,760px);border:0}
+.map-reseal{text-align:center;margin-top:14px}
+.map-reseal button{font-family:'Nanum Myeongjo',serif;font-size:.82rem;color:var(--slate);cursor:pointer;
+ background:transparent;border:1px solid var(--line);border-radius:999px;padding:7px 18px;transition:.25s}
+.map-reseal button:hover{color:var(--pearl);border-color:var(--line-c)}
 footer{text-align:center;padding:80px 22px 100px;border-top:1px solid var(--line);margin-top:40px}
 footer .fl{font-family:'UnifrakturMaguntia',serif;font-size:2rem;color:var(--pearl-hi);margin-bottom:8px}
 footer .fq{color:var(--slate);font-size:.9rem}
@@ -163,7 +185,7 @@ footer .cr{margin-top:36px;font-size:11px;color:#4b566e;letter-spacing:.1em}
 </style></head><body>
 <nav><div class="pill">
  <a href="#main" class="on">메인</a><a href="#worldview">세계관</a><a href="#character">캐릭터</a>
- <a href="#webtoon">웹툰</a><a href="#map">제국지도<span class="lk">&#128274;</span></a>
+ <a href="#webtoon">웹툰</a><a href="#map">제국지도</a>
 </div></nav>
 
 <header class="hero" id="main">
@@ -210,8 +232,16 @@ footer .cr{margin-top:36px;font-size:11px;color:#4b566e;letter-spacing:.1em}
 
 <section id="map">
  <div class="head"><div class="eyebrow">Imperial Map</div><h2>제국지도</h2><div class="divide"></div></div>
- <div class="locked rv"><div class="lockbadge">&#128274; 봉인</div><div class="chain">&#9939; &#9939; &#9939;</div>
-  <h3>봉인된 지도</h3><p>제국의 영지와 세력의 판도가 아직 봉인되어 있습니다. 세계가 무르익으면, 지도 위의 사슬이 하나씩 풀립니다.</p></div>
+ <div class="locked rv" id="mapLock" role="button" tabindex="0" aria-label="봉인 해제하고 지도 열기">
+  <div class="lockbadge">&#128274; 봉인</div><div class="chain">&#9939; &#9939; &#9939;</div>
+  <h3>봉인된 지도</h3>
+  <p>제국의 수도 알트하벤이 봉인 너머에 잠들어 있습니다. 사슬에 손을 대면, 지도가 펼쳐집니다.</p>
+  <div class="hint">&#9670;&ensp;봉인 풀기&ensp;&#9670;</div>
+ </div>
+ <div class="map-shell" id="mapShell">
+  <iframe id="mapFrame" title="알트하벤 지도" loading="lazy" data-src="althaven_map.html"></iframe>
+ </div>
+ <div class="map-reseal" id="mapReseal" style="display:none"><button type="button">&#9939; 다시 봉인하기</button></div>
 </section>
 
 <footer><div class="fl">Tria Empire</div>
@@ -372,6 +402,31 @@ const links=[...document.querySelectorAll('.pill a')];
 const secs=links.map(a=>document.querySelector(a.getAttribute('href')));
 window.addEventListener('scroll',()=>{let cur=0;secs.forEach((s,i)=>{if(s&&s.getBoundingClientRect().top<160)cur=i;});
  links.forEach((a,i)=>a.classList.toggle('on',i===cur));});
+// map seal
+(function(){
+ const lock=document.getElementById('mapLock'),shell=document.getElementById('mapShell'),
+  frame=document.getElementById('mapFrame'),reseal=document.getElementById('mapReseal');
+ let opened=false;
+ function open(){
+  if(opened)return;opened=true;
+  lock.classList.add('breaking');
+  setTimeout(()=>{
+   lock.style.display='none';
+   if(!frame.src)frame.src=frame.dataset.src;
+   shell.classList.add('reveal');
+   reseal.style.display='block';
+   shell.scrollIntoView({behavior:'smooth',block:'center'});
+  },650);
+ }
+ function close(){
+  opened=false;
+  shell.classList.remove('reveal');reseal.style.display='none';
+  lock.classList.remove('breaking');lock.style.display='';
+ }
+ lock.addEventListener('click',open);
+ lock.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open();}});
+ reseal.querySelector('button').addEventListener('click',close);
+})();
 // bgm
 const audio=new Audio('bgm.mp3');audio.loop=true;
 const btn=document.getElementById('bgm');
