@@ -617,11 +617,24 @@ window.addEventListener('scroll',()=>{let cur=0;secs.forEach((s,i)=>{if(s&&s.get
  lock.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open();}});
  reseal.querySelector('button').addEventListener('click',close);
 })();
-// bgm
-const audio=new Audio('bgm.mp3');audio.loop=true;
+// bgm — 브라우저 정책상 완전 자동재생은 불가. 첫 상호작용(클릭/터치/스크롤/키)에서 자동 시작.
+const audio=new Audio('bgm.mp3');audio.loop=true;audio.volume=.6;
 const btn=document.getElementById('bgm');
-btn.onclick=()=>{if(audio.paused){audio.play().then(()=>{btn.textContent='♪';btn.classList.add('playing');}).catch(()=>{});}
- else{audio.pause();btn.textContent='♫';btn.classList.remove('playing');}};
+let userPaused=false;
+function playBgm(){audio.play().then(()=>{btn.textContent='♪';btn.classList.add('playing');}).catch(()=>{});}
+function pauseBgm(){audio.pause();btn.textContent='♫';btn.classList.remove('playing');}
+btn.onclick=(e)=>{e.stopPropagation();
+ if(audio.paused){userPaused=false;playBgm();}else{userPaused=true;pauseBgm();}};
+function autoStart(){
+ if(!userPaused&&audio.paused)playBgm();
+ window.removeEventListener('pointerdown',autoStart);
+ window.removeEventListener('keydown',autoStart);
+ window.removeEventListener('scroll',autoStart);
+ window.removeEventListener('touchstart',autoStart);
+}
+window.addEventListener('pointerdown',autoStart);
+window.addEventListener('keydown',autoStart);
+window.addEventListener('scroll',autoStart,{passive:true});
+window.addEventListener('touchstart',autoStart,{passive:true});
 </script>
 </body></html>
-
